@@ -1,0 +1,151 @@
+---
+import '../styles/global.css';
+import { CODE_PLACEHOLDER, SUPPORTED_LANGUAGES, REVIEW_FOCUS_OPTIONS } from '../constants';
+
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-4xl mx-auto">
+			<!-- Header -->
+			<div class="text-center mb-12">
+				<h1 class="text-4xl font-bold text-gray-900 mb-4">
+					Code Review Tool
+				</h1>
+				<p class="text-xl text-gray-600 max-w-2xl mx-auto">
+					Get AI-powered line-by-line code review feedback powered by OpenAI.
+					Submit your code and receive detailed insights to improve your code quality.
+				</p>
+			</div>
+
+			<!-- Main Form -->
+			<div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+				<div class="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+					<h2 class="text-2xl font-semibold text-white">
+						Submit Code for Review
+					</h2>
+					<p class="text-blue-100 mt-2">
+						Paste your code below and get instant feedback
+					</p>
+				</div>
+
+				<form id="reviewForm" class="p-8 space-y-6">
+					<!-- Code Input Section -->
+					<div>
+						<label for="code" class="block text-sm font-medium text-gray-700 mb-3">
+							Code to Review
+						</label>
+						<div class="relative">
+							<textarea
+								id="code"
+								name="code"
+								rows="20"
+								class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors duration-200"
+								placeholder={CODE_PLACEHOLDER}
+								required
+							></textarea>
+							<div class="absolute top-3 right-3">
+								<div class="flex space-x-1">
+									<div class="w-3 h-3 rounded-full bg-red-400"></div>
+									<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+									<div class="w-3 h-3 rounded-full bg-green-400"></div>
+								</div>
+							</div>
+						</div>
+						<p class="mt-2 text-sm text-gray-500">
+							Supports all major programming languages. The AI will analyze your code and provide detailed feedback.
+						</p>
+					</div>
+
+					<!-- Language Selection (Optional) -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label for="language" class="block text-sm font-medium text-gray-700 mb-2">
+								Programming Language (Optional)
+							</label>
+							<select
+								id="language"
+								name="language"
+								class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+							>
+								{SUPPORTED_LANGUAGES.map(lang => (
+									<option value={lang.value}>{lang.label}</option>
+								))}
+							</select>
+						</div>
+
+						<div>
+							<label for="focus" class="block text-sm font-medium text-gray-700 mb-2">
+								Review Focus (Optional)
+							</label>
+							<select
+								id="focus"
+								name="focus"
+								class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+							>
+								{REVIEW_FOCUS_OPTIONS.map(option => (
+									<option value={option.value}>{option.label}</option>
+								))}
+							</select>
+						</div>
+					</div>
+
+					<!-- Submit Button -->
+					<div class="flex items-center justify-center pt-4">
+						<button
+							type="submit"
+							class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500/50 transform transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							<svg class="w-5 h-5 mr-3 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+							</svg>
+							Analyze Code with AI
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Results Container -->
+			<div id="resultsContainer" class="mt-12 hidden"></div>
+
+			<!-- Features Section -->
+			<div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="text-center">
+					<div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold text-gray-900 mb-2">Fast Analysis</h3>
+					<p class="text-gray-600">Get comprehensive code review feedback in seconds</p>
+				</div>
+
+				<div class="text-center">
+					<div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold text-gray-900 mb-2">Line-by-Line</h3>
+					<p class="text-gray-600">Detailed feedback on specific code sections</p>
+				</div>
+
+				<div class="text-center">
+					<div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+						</svg>
+					</div>
+					<h3 class="text-lg font-semibold text-gray-900 mb-2">AI Powered</h3>
+					<p class="text-gray-600">Advanced analysis using OpenAI's latest models</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	import { initializeCodeReview } from '../scripts/review.js';
+	initializeCodeReview();
+</script>
