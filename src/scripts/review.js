@@ -59,7 +59,7 @@ export function initializeCodeReview() {
       <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
         <div class="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-emerald-600">
           <h2 class="text-2xl font-semibold text-white">
-            Code Review Results
+            Error Ferret Results
           </h2>
           <div class="flex items-center space-x-4 mt-2 text-green-100 text-sm">
             <span>Language: ${language}</span>
@@ -80,7 +80,7 @@ export function initializeCodeReview() {
               onclick="window.location.reload()"
               class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
             >
-              Review Another Code
+              Analyze Another Code
             </button>
           </div>
         </div>

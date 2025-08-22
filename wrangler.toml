@@ -1,4 +1,4 @@
-name = "astro-gpt-code-review-tool"
+name = "error-ferret"
 main = "dist/worker/entry.js"
 compatibility_date = "2024-01-01"
 

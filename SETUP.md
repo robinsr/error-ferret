@@ -1,4 +1,4 @@
-# Setup Guide for Code Review Tool
+# Setup Guide for Error Ferret
 
 ## Prerequisites
 
