@@ -253,4 +253,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Need help?** Check the [SETUP.md](SETUP.md) file for detailed setup instructions or open an issue on GitHub.
+<a href="https://www.vecteezy.com/free-vector/ferret">Ferret Vectors by Vecteezy</a>
