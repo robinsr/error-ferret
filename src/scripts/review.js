@@ -20,10 +20,21 @@ export function initializeCodeReview() {
     setLoading(true);
     hideResults();
 
+    const payload = {
+      code,
+      language: 'javascript',
+      focus: 'general',
+    }
+
+    console.log('Sending review request:', payload);
+
     try {
-      const response = await fetch('/api/review', {
+      const response = await fetch('/api/review.json', {
         method: 'POST',
-        body: formData
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();

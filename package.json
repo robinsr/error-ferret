@@ -15,7 +15,9 @@
     "@openai/openai": "npm:@jsr/openai__openai@^5.13.1",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.2",
+    "openai": "^5.15.0",
     "tailwindcss": "^4.1.12",
+    "ts-prompt": "link:jsr:@schoolai/ts-prompt",
     "typescript": "^5.9.2"
   }
 }
