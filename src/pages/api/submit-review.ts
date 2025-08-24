@@ -10,6 +10,10 @@ interface ReviewItem {
   feedback: string;
 }
 
+/**
+ * @deprecated - This is no longer used, but kept for reference.
+ * A POST handler that generates feedback for a given code snippet, returning a JSON response.
+ */
 export const POST: APIRoute = async (context: APIContext) => {
   const { request } = context;
 

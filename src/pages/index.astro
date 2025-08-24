@@ -1,11 +1,10 @@
 ---
 export const prerender = false;
 
-
 import '@/styles/global.css';
-import { CODE_PLACEHOLDER, SUPPORTED_LANGUAGES, REVIEW_FOCUS_OPTIONS } from '@/constants';
+import { CODE_PLACEHOLDER, SUPPORTED_LANGUAGES, REVIEW_FOCUS_OPTIONS, EXPERIENCE_LEVEL_OPTIONS } from '@/constants';
 import { generateFeedback } from '@/services/openai/feedback';
-import type { FeedbackItem as FeedbackItemType } from '@/types';
+import type { FeedbackItem as FeedbackItemType, PromptConfig, FocusArea, ExperienceLevel } from '@/types';
 import Layout from '@/layouts/Layout.astro';
 import Section from '@/components/Section.astro';
 import Features from '@/components/Features.astro';
@@ -15,13 +14,13 @@ import InputLabel from '@/components/InputLabel.astro';
 import TextareaInput from '@/components/TextareaInput.astro';
 import SubmitButton from '@/components/SubmitButton.astro';
 import Feedback from '@/components/Feedback.astro';
+import ErrorMsg from '@/components/Error.astro';
 
 
-
-
-let code = '';
-let language = 'auto-detected';
-let focus = 'general';
+let code = 'auto-detect';
+let language = '';
+let focus: FocusArea = 'general';
+let experienceLevel: ExperienceLevel = 'apprentice';
 let error = '';
 let feedbackItems: FeedbackItemType[] = [];
 
@@ -30,24 +29,32 @@ if (Astro.request.method === 'POST') {
 
   code = formData.get('code') as string;
   language = formData.get('language') as string;
-  focus = formData.get('focus') as string;
+  focus = formData.get('focus') as FocusArea;
+  experienceLevel = formData.get('experienceLevel') as ExperienceLevel;
 
-  console.log('POST data:', { code, language, focus });
+  const config: PromptConfig = { language, focus, experienceLevel };
+
+  // console.debug('POST data:', { code, language, focus, experienceLevel });
 
   try {
-    feedbackItems = await generateFeedback(code, language, focus);
+    feedbackItems = await generateFeedback(code, config);
   } catch (e) {
+    console.error('Error:', error);
+
     error = e instanceof Error ? e.message : 'An unknown error occurred';
+    feedbackItems = [];
   }
 }
 
 const hasFeedbackItems = feedbackItems.length > 0;
 
+const hasError = error !== '';
+
 ---
 
 <Layout>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto flex flex-col gap-8">
       <Header />
 
       <!-- Main Form -->
@@ -77,9 +84,10 @@ const hasFeedbackItems = feedbackItems.length > 0;
           </div>
 
           <!-- Language and Focus Selection -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <SelectInput options={SUPPORTED_LANGUAGES} label="Programming Language (Optional)" name="language" selectedValue={language} />
-            <SelectInput options={REVIEW_FOCUS_OPTIONS} label="Review Focus (Optional)" name="focus" selectedValue={focus} />
+            <SelectInput options={REVIEW_FOCUS_OPTIONS} label="Review Focus" name="focus" selectedValue={focus} />
+            <SelectInput options={EXPERIENCE_LEVEL_OPTIONS} label="Experience Level" name="experienceLevel" selectedValue={experienceLevel} />
           </div>
 
           <div class="flex items-center justify-center pt-4">
@@ -89,15 +97,23 @@ const hasFeedbackItems = feedbackItems.length > 0;
       </Section>
 
       {hasFeedbackItems && (
-        <Feedback items={feedbackItems} />
+        <Section title="Feedback" description="AI-powered line-by-line feedback" colorScheme="green">
+          <Feedback items={feedbackItems} />
+        </Section>
+      )}
+
+      {hasError && (
+        <Section title="Error" description="An error occurred while generating feedback" colorScheme="red">
+          <ErrorMsg error={error} />
+        </Section>
       )}
 
       <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div id="loadingOverlay" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
           <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <h3 class="text-xl font-semibold text-gray-900 mb-2">Processing Your Code</h3>
-          <p class="text-gray-600">Please wait while AI analyzes your code. This may take up to 10 seconds...</p>
+          <p class="text-gray-600">Please wait while AI analyzes your code. This may take up to 1 minute...</p>
         </div>
       </div>
 
@@ -113,38 +129,10 @@ const hasFeedbackItems = feedbackItems.length > 0;
 
   if (form && submitButton && buttonText && loadingOverlay) {
     form.addEventListener('submit', function(e) {
-
-      // Allow form submission
-      //e.preventDefault();
-
       // Show loading state
       submitButton.disabled = true;
       buttonText.textContent = 'Processing...';
       loadingOverlay.classList.remove('hidden');
-
-      // // Submit the form
-      // const formData = new FormData(this as HTMLFormElement);
-
-      // fetch('/api/submit-review', {
-      //   method: 'POST',
-      //   body: formData
-      // })
-      // .then(response => {
-      //   if (response.redirected) {
-      //     // Redirect to the review page
-      //     window.location.href = response.url;
-      //   } else {
-      //     throw new Error('Unexpected response');
-      //   }
-      // })
-      // .catch(error => {
-      //   console.error('Error:', error);
-      //   // Reset button state
-      //   submitButton.disabled = false;
-      //   buttonText.textContent = 'Analyze Code with AI';
-      //   loadingOverlay.classList.add('hidden');
-      //   alert('An error occurred. Please try again.');
-      // });
     });
   }
 </script>

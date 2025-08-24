@@ -1,70 +1,59 @@
 import type { FeedbackItem } from '@/types';
 
 export const mockFeedbackItems: FeedbackItem[] = [
+
+]
+
+export const mockChoices = [
   {
-    line: 7,
-    column: 1,
-    snippet: 'import sys\r\nimport chromadb\r\nimport typer\r\n\r',
-    feedback: 'Consider using a configuration management approach for constants like VAULT and CHROMA_DB_DIR. Hardcoding values can lead to difficulties in managing different environments (e.g., development, staging, production). You might want to use environment variables or a configuration file.'
-  },
-  {
-    line: 19,
-    column: 1,
-    snippet: '\r\n' +
-      'console = Console()\r\n' +
-      'error_console = Console(stderr=True)\r\n' +
-      'app = typer.Typer()\r',
-    feedback: "The function 'eprint' is a good utility for error printing, but consider raising exceptions instead of calling sys.exit(1). This allows for better error handling and testing, as it can be caught by calling code."
-  },
-  {
-    line: 27,
-    column: 1,
-    snippet: 'VAULT = "ryaaan-tech" # TODO: configurable\r\n' +
-      'CHROMA_DB_DIR = "embeddings"   # Where you persist the ChromaDB\r\n' +
-      'COLLECTION_NAME = "obsidian_notes"\r\n' +
-      'EMBEDDING_MODEL = "all-MiniLM-L6-v2"\r',
-    feedback: "The 'load' function is doing multiple things (loading the model and connecting to the database). Consider separating these concerns into distinct functions for better readability and maintainability."
-  },
-  {
-    line: 35,
-    column: 1,
-    snippet: '    error_console.print(f"[bold red]Error[/bold red] {msg}")\r\n\r\n\r\n\r',
-    feedback: "The 'encode_uri' function can be improved by using urllib.parse.quote instead of manual replacements. This will handle more edge cases and is more idiomatic."
-  },
-  {
-    line: 45,
-    column: 1,
-    snippet: '    stat.update(">> Connecting to ChromaDB...")\r\n' +
-      '    client = chromadb.PersistentClient(path=CHROMA_DB_DIR)\r\n' +
-      '\r\n' +
-      '    # Get collection\r',
-    feedback: "In the 'query' function, instead of checking if 'query' is empty with 'if not query or len(query) == 0:', you can simplify this to 'if not query:'. This is more Pythonic and concise."
-  },
-  {
-    line: 56,
-    column: 1,
-    snippet: '\r\n' +
-      '\r\n' +
-      '# Removes path components up to vault name\r\n' +
-      'def relative_note_path(filepath):\r',
-    feedback: 'When printing results, consider checking if results contain any documents before iterating over them. This avoids potential index errors if the query returns no results.'
-  },
-  {
-    line: 60,
-    column: 1,
-    snippet: "    pattern = r'^.*/{}/'.format(re.escape(VAULT))\r\n" +
-      "    return re.sub(pattern, '', filepath)\r\n" +
-      '\r\n' +
-      '\r',
-    feedback: "The use of 'console.print()' for displaying results is good, but consider consolidating the printing logic into a separate function. This will help keep the 'query' function focused on its primary responsibility."
-  },
-  {
-    line: 66,
-    column: 1,
-    snippet: '    vault = re.escape(VAULT)\r\n' +
-      '    file = encode_uri(relative_note_path(filepath))\r\n' +
-      '    return f"obsidian://open?vault={vault}&file={file}"\r\n' +
-      '\r',
-    feedback: "The use of 'typer.run(query)' is appropriate for a CLI application. However, consider adding a main guard to allow for easier testing of the 'query' function independently."
+    index: 0,
+    message: {
+      role: 'assistant',
+      content: '[\n' +
+        '  {\n' +
+        '    "line": "    vault = re.escape(VAULT)",\n' +
+        '    "lineNumber": 64,\n' +
+        '    "feedback": "Do not use re.escape for URL construction; it escapes for regex, not URIs, and can produce malformed or unsafe links. Use urllib.parse.quote for the vault value or build the query with urllib.parse.urlencode."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "    return uri.replace(\\" \\", \\"%20\\").replace(\\"/\\", \\"%2F\\")",\n' +
+        '    "lineNumber": 53,\n' +
+        '    "feedback": "Manual URL encoding is incomplete and error-prone (e.g., does not encode &, ?, #, %). Use urllib.parse.quote for path segments to prevent URI injection or broken links."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "        console.print(Markdown(doc.strip()))",\n' +
+        '    "lineNumber": 108,\n' +
+        '    "feedback": "Rendering untrusted content as Markdown can allow terminal control sequences or malicious links to be displayed. Sanitize input (strip control chars), and consider rendering as plain Text or a safe subset rather than arbitrary Markdown."\n' +
+        '  },\n' +
+        '  {\n' +
+        `    "line": "        console.rule(f\\"Result {i+1} ({meta['source']})\\")",\n` +
+        '    "lineNumber": 106,\n' +
+        '    "feedback": "Interpolating untrusted strings into Rich output can enable markup/ANSI injection. Escape or disable markup for this value (e.g., wrap in rich.text.Text to avoid markup parsing or disable markup for this call)."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "    typer.run(query)",\n' +
+        '    "lineNumber": 115,\n' +
+        '    "feedback": "Uncaught exceptions will print full tracebacks revealing filesystem paths and internals. Wrap the CLI entrypoint or query logic in try/except to emit a concise error (optionally behind a --debug flag) and exit with a nonzero status."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "    client = chromadb.PersistentClient(path=CHROMA_DB_DIR)",\n' +
+        '    "lineNumber": 44,\n' +
+        '    "feedback": "Persistent storage may include sensitive embeddings; ensure the directory is created with restrictive permissions (e.g., 0700) before use and verify permissions at startup to prevent other users from reading the data."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "    query_embedding = embedder.encode(query)",\n' +
+        '    "lineNumber": 82,\n' +
+        '    "feedback": "Embedding arbitrarily long input can be abused for DoS. Enforce a maximum query length and reject or truncate overly long inputs to limit CPU/memory usage."\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "line": "    embedder = SentenceTransformer(EMBEDDING_MODEL)",\n' +
+        '    "lineNumber": 40,\n' +
+        '    "feedback": "Loading models from remote hubs without pinning increases supply-chain risk. Pin a specific model revision and dependency versions, verify checksums, and prefer offline cache/local files to avoid unexpected model/code changes."\n' +
+        '  }\n' +
+        ']',
+      refusal: null,
+      annotations: []
+    },
+    finish_reason: 'stop'
   }
 ]

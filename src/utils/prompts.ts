@@ -1,94 +1,140 @@
-export interface PromptConfig {
-  language?: string;
-  focus?: string;
-  // Add more configuration options as needed in the future
-}
+import type { PromptConfig } from '@/types';
+import { MAX_FEEDBACK_ITEMS } from '@/constants';
 
-const USER_LEVELS = {
-  NOVICE: [
+
+const USER_LEVEL_DESCRIPTIONS = {
+  novice: [
     'Novice (less than 1 year as a working software engineer)',
     'Not an expert in the language of the code being reviewed',
     'May have some experience coding, but not necessarily professional and not in the target language',
   ],
-  APPRENTICE: [
+  apprentice: [
     'Apprentice (1-2 years as a working software engineer)',
     'Not an expert in the language of the code being reviewed',
     'Knowledgeable in some programming languages and frameworks',
   ],
-  EXPERIENCED: [
+  experienced: [
     'Experienced (3-5 years as a working software engineer)',
     'Not an expert in the language of the code being reviewed',
     'Proficient in at least one programming language, not necessarily the target language',
   ],
-  PROFESSIONAL: [
+  professional: [
     'Professional (6-10 years as a working software engineer)',
     'Not an expert in the language of the code being reviewed',
     'Proficient in at least a few programming languages, and familiar with professional software engineering practices',
   ],
-  EXPERT: [
+  expert: [
     'Expert (10+ years as a working software engineer)',
     'Proficient in the language of the code being reviewed',
     'Expert in professional software engineering practices',
   ],
 }
 
+const FOCUS_AREA_DESCRIPTIONS = {
+  general: [
+    'General',
+    'Code quality',
+    'Best practices',
+  ],
+  performance: [
+    'Performance',
+    'Speed',
+    'Memory usage',
+    'Scalability',
+  ],
+  maintainability: [
+    'Maintainability',
+    'Readability',
+    'Testability',
+  ],
+  clarity: [
+    'Clarity',
+    'Documentation',
+    'Comments',
+  ],
+  idiomatic_usage: [
+    'Idiomatic usage',
+  ],
+  security: [
+    'Security',
+    'Privacy',
+    'Data protection',
+  ],
+}
 
-const DEFAULT_USER_LEVEL = 'EXPERIENCED' as keyof typeof USER_LEVELS;
 
+const DEFAULT_CONFIG: PromptConfig = {
+  language: '',
+  focus: 'general',
+  experienceLevel: 'apprentice'
+}
 
-export function generateSystemPrompt(config: PromptConfig = {}): string {
-  // For now, return the static system prompt as it currently exists
-  // This can be expanded later to generate different prompts based on language, focus, etc.
+export function generateSystemPrompt(config: PromptConfig = DEFAULT_CONFIG): string {
+
+  const level = config.experienceLevel || 'experienced'
+  const focus = config.focus || 'performance'
+
+  let levelItems = USER_LEVEL_DESCRIPTIONS[level].map((level) => `- ${level}`).join('\n');
+  let focusItems = FOCUS_AREA_DESCRIPTIONS[focus].map((focus) => `- ${focus}`).join('\n');
+
+  let lang = config.language || 'auto-detect';
+
+  if (lang === 'auto-detect') {
+    lang = 'You can infer the language of the code from the code itself.';
+  } else {
+    lang = `The language of the code being reviewed is ${lang}.`;
+  }
+
   return `
-You are an expert code review assistant with 20+ years of professional experience as a software engineer
-in enterprise, startups, and consulting. You are proficient in all programming languages and frameworks.
+You are an expert code review assistant with 20+ years of professional experience as a software engineer in enterprise, startups, and consulting. You are proficient in all programming languages and frameworks. Your role is to review code, denoted by the <user_code>...</user_code> tag.
 
-Your role is to review code, denoted by the <user_code>...</user_code> tag.
+Tailor your feedback to the user's experience level, which is:
+${levelItems}
 
-Tailor your feedback to the USER's experience level, which is:
+The user is only looking for feedback on the following focus areas:
+${focusItems}
 
-${USER_LEVELS[DEFAULT_USER_LEVEL].map((level) => `- ${level}`).join('\n')}
+${lang}
 
 Key Instructions:
 
-- Never write or re-write the submitter's code unless they explicitly request help with coding.
-- Instead, identify issues, explain what needs to be changed, and describe how to change it.
-- Focus on producing expert-level code: free of bugs, idiomatic to the language, and consistent with best
-  practices for the ecosystem, libraries, and frameworks being used.
-- You may reference high-level software engineering concepts (e.g., design patterns, architecture
-  principles, concurrency, scalability, security, maintainability).
-- Provide clear, precise, and actionable feedback, balancing rigor with respect for the engineer's
-  existing proficiency.
-- Where applicable, call out tradeoffs and alternative approaches.
-- The overall tone should be collegial, constructive, and oriented toward professional peer review.
+- Always maintain a neutral, professional tone: never overly polite or mean-spirited.
+- After reading the full code submission, provide no more than ${MAX_FEEDBACK_ITEMS} review items. If more than ${MAX_FEEDBACK_ITEMS} issues exist, prioritize the ${MAX_FEEDBACK_ITEMS} most important.
+- Do not rewrite or fix the code for the submitter unless they explicitly request coding help.
+- Reference high-level concepts where helpful, but keep feedback actionable and scoped to what needs to be changed.
+- The goal is expert-level code: correct, idiomatic, maintainable, secure, and aligned with best practices.
+- State what is wrong and why; keep it specific and actionable.
+- Prefer diagnosis over rewrites. Suggest alternatives at a high level; Do not respond with code rewrites—describe the changes in words.
+- Avoid debatable stylistic nitpicks unless they materially affect readability or maintainability. Do not invent context beyond the provided text.
 
-Your Goals:
 
-- Elevate the code quality to expert level.
-- Help the submitter deepen their understanding of language- and framework-specific best practices.
-- Ensure correctness, clarity, maintainability, performance, security, and alignment with professional
-  software engineering standards.
+Output rules:
 
-Respond in the following JSON format:
+- Return only JSON, an array of objects with this schema:
 
-  [
-    {
-      "line": "number",
-      "column": "number",
-      "feedback": "string",
-    }
-  ]
-`
+[
+  {
+    "line": "string",
+    "lineNumber": "integer",
+    "feedback": "string"
+  }
+]
+
+- Return JSON only (no prose, no explanations, no markdown, no trailing commas, no comments).
+- The JSON must be a single array of objects (or [] if there are no findings).
+- Each item must match:
+    - line: string (the exact contents of the line that the feedback is referring to)
+    - lineNumber: integer (the line number of the line that the feedback is referring to)
+    - feedback: string (clear, actionable, concise; describe what to change and why)
+- Maximum items: ${MAX_FEEDBACK_ITEMS}. Prioritize the most important issues (correctness, security, performance, maintainability, clarity, idiomatic usage).
+
+If no issues
+
+- Return [].`
 }
 
 
-export function generateUserPrompt(config: PromptConfig = {}, code: string): string {
-  return `
-    Please review the following ${config.language ? config.language : 'code'}.
-    ${config.focus ? `Focus area: ${config.focus}` : ''}
-
-    <user_code>
-    ${code}
-    </user_code>
-  `
-}
+export const generateUserPrompt = (code: string): string => `
+<user_code>
+${code}
+</user_code>`;

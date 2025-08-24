@@ -4,6 +4,7 @@ import { respondErr, respondOK } from '../../utils/request';
 
 
 /**
+ * @deprecated - This is no longer used, but kept for reference.
  * A POST handler that generates feedback for a given code snippet, returning a JSON response.
  *
  * @param context - The Astro API context.
