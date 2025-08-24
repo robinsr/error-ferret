@@ -2,6 +2,7 @@
   "name": "error-ferret",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.15.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build",
@@ -12,12 +13,13 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/cloudflare": "^12.6.4",
-    "@openai/openai": "npm:@jsr/openai__openai@^5.13.1",
+    "@lucide/astro": "^0.541.0",
+    "@openai/openai": "jsr:^5.15.0",
+    "@schoolai/ts-prompt": "jsr:^0.9.2",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.2",
     "openai": "^5.15.0",
     "tailwindcss": "^4.1.12",
-    "ts-prompt": "link:jsr:@schoolai/ts-prompt",
     "typescript": "^5.9.2"
   }
 }

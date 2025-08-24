@@ -1,70 +1,34 @@
 import type { APIContext, APIRoute } from 'astro';
-import { generateSystemPrompt, generateUserPrompt } from '../../utils/prompts';
-import OpenAI from '@openai/openai';
+import { generateFeedback } from '@/services/openai/feedback';
 import { respondErr, respondOK } from '../../utils/request';
 
+
+/**
+ * A POST handler that generates feedback for a given code snippet, returning a JSON response.
+ *
+ * @param context - The Astro API context.
+ * @returns A JSON response containing the feedback items, language, focus, and timestamp.
+ */
 export const POST: APIRoute = async (context: APIContext) => {
 
   const { request } = context;
 
-  const headers = request.headers;
-
-  console.log('Received review request:', request);
-
   try {
     const payload = await request.json();
     const code = payload.code as string;
-    const language = payload.language as string;
-    const focus = payload.focus as string;
-
-    console.log(code, language, focus);
+    const language = payload.language as string || 'auto-detected';
+    const focus = payload.focus as string || 'general';
 
     if (!code || code.trim() === '') {
-      return new Response(JSON.stringify({ error: 'Code is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return respondErr('No code submitted', 400)
     }
 
-    // Initialize OpenAI client
-    const client = new OpenAI({
-      apiKey: import.meta.env.OPENAI_API_KEY,
-    });
+    const feedbackItems = await generateFeedback(code, language, focus);
+    const timestamp = new Date().toISOString();
 
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: generateSystemPrompt({ language, focus })
-        },{
-          role: 'user',
-          content: generateUserPrompt({ language, focus }, code)
-        }
-      ],
-      max_tokens: 2000,
-      temperature: 0.3,
-    });
-
-    console.log(response);
-
-    const review = response.choices[0]?.message?.content || 'No review generated';
-
-    return new Response(JSON.stringify({
-      review,
-      language: language || 'auto-detected',
-      focus: focus || 'general',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return respondOK({ feedbackItems, language, focus, timestamp });
   } catch (error) {
     console.error('Code review error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return respondErr(error);
   }
 };

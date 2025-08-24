@@ -1,0 +1,19 @@
+---
+import type { FeedbackItem as FeedbackItemType } from '@/types';
+import FeedbackItem from './FeedbackItem.astro';
+import Section from './Section.astro';
+
+interface Props {
+  items: FeedbackItemType[];
+}
+
+const { items } = Astro.props;
+---
+
+<Section title="Feedback" description="AI-powered line-by-line feedback" colorScheme="green">
+  <div class="flex flex-col gap-4 pt-8">
+    {items.map((feedbackItem: FeedbackItemType) => (
+      <FeedbackItem feedbackItem={feedbackItem} />
+    ))}
+  </div>
+</Section>

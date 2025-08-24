@@ -1,0 +1,86 @@
+---
+import type { FeedbackItem } from '@/types';
+
+import { Info } from '@lucide/astro';
+
+interface Props {
+  feedbackItem: FeedbackItem;
+}
+
+const { feedbackItem } = Astro.props;
+
+const { line, column, snippet, feedback } = feedbackItem;
+
+// Split snippet into lines for proper display
+const codeLines = snippet.split('\n');
+const lineNumbers = Array.from({ length: codeLines.length }, (_, i) => (line - 3) + i);
+
+---
+
+<div class="feedback-item bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mb-6 mx-4">
+  <!-- Header with line info -->
+  <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+    <div class="flex items-center gap-2">
+      <Info class="w-4 h-4 text-gray-500" />
+
+      <span class="text-sm font-medium text-gray-700">Line {line}</span>
+      {column > 1 && (
+        <span class="text-sm text-gray-500">• Column {column}</span>
+      )}
+    </div>
+  </div>
+
+  <!-- Code section -->
+  <div class="relative">
+    <div class="overflow-x-auto">
+      <div class="min-w-full bg-gray-900 text-gray-100 font-mono text-sm">
+        {codeLines.map((codeLine, index) => {
+          const isIssueLine = lineNumbers[index] === line;
+          return (
+            <div class={`group flex transition-colors duration-150 ${
+              isIssueLine
+                ? 'bg-red-900/20 border-l-2 border-l-red-500'
+                : 'hover:bg-gray-800'
+            }`}>
+              <!-- Line number -->
+              <div class={`flex-shrink-0 w-12 px-3 py-1 text-right border-r border-gray-700 select-none ${
+                isIssueLine ? 'text-red-400 font-medium' : 'text-gray-500'
+              }`}>
+                {lineNumbers[index]}
+              </div>
+              <!-- Code content -->
+              <div class="flex-1 px-3 py-1 min-w-0">
+                <span class="whitespace-pre">{codeLine}</span>
+                {/* Show pointer at the specific column */}
+                {isIssueLine && column > 1 && (
+                  <span class="inline-block ml-1 text-red-400">
+                    {Array.from({ length: column - 1 }, () => ' ').join('')}↑
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback section -->
+  <div class="px-4 py-4 bg-blue-50 border-t border-blue-200 rounded-b-lg">
+    <div class="flex items-start justify-center items-center gap-3">
+      <!-- Error Ferret Avatar -->
+      <div class="flex-shrink-0">
+        <img
+          src="/images/ferret_avatar.jpg"
+          alt="Error Ferret"
+          class="w-12 h-12 rounded-full border-2 border-blue-200 shadow-sm"
+        />
+      </div>
+
+      <!-- Feedback text -->
+      <div class="flex-1 min-w-0">
+        <p class="text-base text-gray-800 leading-relaxed">{feedback}</p>
+      </div>
+    </div>
+  </div>
+</div>
