@@ -1,12 +1,17 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors'
 import { connect, StringCodec } from 'nats';
 import { randomUUID } from 'node:crypto';
 import type { CreateReviewResponse, ReviewStatus } from '@errorferret/types';
 
+
+// The port the API server is running on (3000)
 const PORT = Number(process.env.PORT || 3000);
+
+// The URL for the NATS server (messaging later)
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 
-// naive in-memory store for MVP
+// naive in-memory store for MVP.
 const reviews = new Map<string, ReviewStatus>();
 
 const start = async () => {
@@ -14,6 +19,12 @@ const start = async () => {
   // Create the fastify server
   const server = Fastify({
     logger: true
+  });
+
+  // Register CORS to allow local dev
+  await server.register(cors, {
+    origin: ['http://localhost:4321', 'http://localhost:4322'],
+    methods: ['GET','POST','PUT','OPTIONS']
   });
 
 

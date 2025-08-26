@@ -18,39 +18,10 @@ import Feedback from '@/components/Feedback.astro';
 import ErrorMsg from '@/components/Error.astro';
 import ReviewerSelector from '@/components/ReviewerSelector.astro';
 import FileUploadInput from '@/components/FileUploadInput.astro';
+import { ZodNull } from 'astro:schema';
 
-
-let code = 'auto-detect';
 
 let error = '';
-let feedbackItems: FeedbackItemType[] = [];
-let inputMode: 'paste' | 'upload' = 'paste';
-
-if (Astro.request.method === 'POST') {
-  // const formData = await Astro.request.formData();
-
-  // code = formData.get('code') as string;
-  // language = formData.get('language') as string;
-  // const reviewersData = formData.get('selectedReviewers') as string;
-  // selectedReviewers = reviewersData ? reviewersData.split(',').filter(r => r.trim()) as FocusArea[] : ['general'];
-  // experienceLevel = formData.get('experienceLevel') as ExperienceLevel;
-
-  // const config: PromptConfig = { language, selectedReviewers, experienceLevel };
-
-  // // console.debug('POST data:', { code, language, selectedReviewers, experienceLevel });
-
-  // try {
-  //   feedbackItems = await generateFeedback(code, config);
-  // } catch (e) {
-  //   console.error('Error:', error);
-
-  //   error = e instanceof Error ? e.message : 'An unknown error occurred';
-  //   feedbackItems = [];
-  // }
-}
-
-const hasFeedbackItems = feedbackItems.length > 0;
-
 const hasError = error !== '';
 
 ---
@@ -88,7 +59,7 @@ const hasError = error !== '';
 
           <!-- Code Input Section -->
           <div x-show="inputMode === 'paste'" x-transition>
-            <TextareaInput name="code" label="Code to Review" content={code} placeholder={CODE_PLACEHOLDER} />
+            <TextareaInput name="code" label="Code to Review" content={''} placeholder={CODE_PLACEHOLDER} />
           </div>
 
           <!-- File Upload Section -->
@@ -106,12 +77,6 @@ const hasError = error !== '';
       </Section>
 
       <Features />
-
-      {hasFeedbackItems && (
-        <Section title="Feedback" description="AI-powered line-by-line feedback" colorScheme="green">
-          <Feedback items={feedbackItems} />
-        </Section>
-      )}
 
       {hasError && (
         <Section title="Error" description="An error occurred while generating feedback" colorScheme="red">

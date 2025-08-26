@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    /* Language & module resolution */
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Strictness & hygiene */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Paths (shared workspace imports) */
+    "baseUrl": ".",
+    "paths": {
+      "@errorferret/types": ["packages/types/src/index.ts"]
+    }
+
+    /* Do NOT set outDir or jsx here; each package controls its own build.
+       - apps/app (React): set "jsx": "react-jsx" in its tsconfig
+       - apps/web (Astro): add "types": ["astro/client"] in its tsconfig
+       - apps/api & apps/worker: add "types": ["node"] and an "outDir"
+    */
+  },
+
+  /* Let each package choose its own includes; keep base generic. */
+  "exclude": ["node_modules", "dist", "build"]
+}
