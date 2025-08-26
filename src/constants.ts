@@ -7,28 +7,71 @@ function calculateSum(a, b) {
 // The AI will review this code and provide feedback`;
 
 export const SUPPORTED_LANGUAGES = [
-    { value: 'auto-detect', label: 'Auto-detect' },
-    { value: 'javascript', label: 'JavaScript' },
-    { value: 'typescript', label: 'TypeScript' },
-    { value: 'python', label: 'Python' },
-    { value: 'java', label: 'Java' },
-    { value: 'cpp', label: 'C++' },
-    { value: 'csharp', label: 'C#' },
-    { value: 'go', label: 'Go' },
-    { value: 'rust', label: 'Rust' },
-    { value: 'php', label: 'PHP' },
-    { value: 'ruby', label: 'Ruby' },
-    { value: 'swift', label: 'Swift' },
-    { value: 'kotlin', label: 'Kotlin' }
-];
-
-export const REVIEW_FOCUS_OPTIONS = [
-    { value: 'general', label: 'General review' },
-    { value: 'performance', label: 'Performance' },
-    { value: 'maintainability', label: 'Maintainability' },
-    { value: 'clarity', label: 'Clarity' },
-    { value: 'idiomatic_usage', label: 'Idiomatic Usage' },
-    { value: 'security', label: 'Security' },
+  {
+    value: 'auto-detect',
+    ext: '*',
+    label: 'Auto-detect'
+  },
+  {
+    value: 'javascript',
+    ext: '.js',
+    label: 'JavaScript'
+  },
+  {
+    value: 'typescript',
+    ext: '.ts',
+    label: 'TypeScript'
+  },
+  {
+    value: 'python',
+    ext: '.py',
+    label: 'Python'
+  },
+  {
+    value: 'java',
+    ext: '.java',
+    label: 'Java'
+  },
+  {
+    value: 'cpp',
+    ext: '.cpp',
+    label: 'C++'
+  },
+  {
+    value: 'csharp',
+    ext: '.cs',
+    label: 'C#'
+  },
+  {
+    value: 'go',
+    ext: '.go',
+    label: 'Go'
+  },
+  {
+    value: 'rust',
+    ext: '.rs',
+    label: 'Rust'
+  },
+  {
+    value: 'php',
+    ext: '.php',
+    label: 'PHP'
+  },
+  {
+    value: 'ruby',
+    ext: '.rb',
+    label: 'Ruby'
+  },
+  {
+    value: 'swift',
+    ext: '.swift',
+    label: 'Swift'
+  },
+  {
+    value: 'kotlin',
+    ext: '.kt',
+    label: 'Kotlin'
+    }
 ];
 
 export const EXPERIENCE_LEVEL_OPTIONS = [

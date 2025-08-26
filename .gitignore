@@ -173,3 +173,6 @@ temp/
 dist/
 build/
 .output/
+
+# Project specific
+chat_resources/

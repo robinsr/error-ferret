@@ -1,0 +1,65 @@
+---
+import { ImagePlus, XIcon, FileCode } from '@lucide/astro';
+
+import { SUPPORTED_LANGUAGES } from '@/constants';
+import InputLabel from '@/components/InputLabel.astro';
+
+const fileTypes = SUPPORTED_LANGUAGES.map(lang => lang.ext).join(',');
+const supportedLanguages = SUPPORTED_LANGUAGES.map(lang => lang.label).join(', ');
+
+---
+
+<div>
+  <InputLabel name="files" label="Upload Files" />
+
+  <div class="mt-2">
+    <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors duration-200">
+      <div class="space-y-1 text-center">
+        <ImagePlus class="mx-auto h-12 w-12 text-gray-400" stroke-width={1.0} />
+        <div class="flex text-sm text-gray-600">
+          <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+            <span>Upload files</span>
+            <input
+              id="file-upload"
+              name="files"
+              type="file"
+              multiple
+              accept={fileTypes}
+              class="sr-only"
+              @change="handleFileSelection($event.target)"
+            />
+          </label>
+          <p class="pl-1">or drag and drop</p>
+        </div>
+        <p class="text-xs text-gray-500">
+          Supports: {supportedLanguages}
+        </p>
+      </div>
+    </div>
+
+    <!-- Selected Files Display -->
+    <div x-show="selectedFiles.length > 0" x-transition class="mt-4 space-y-2">
+      <h4 class="text-sm font-medium text-gray-700">Selected Files:</h4>
+      <div class="space-y-2">
+        <template x-for="(file, index) in selectedFiles" :key="index">
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex items-center space-x-3">
+              <FileCode class="w-5 h-5 text-gray-400" stroke-width={2.0} />
+              <div>
+                <p class="text-sm font-medium text-gray-900" x-text="file.name"></p>
+                <p class="text-xs text-gray-500" x-text="`${(file.size / 1024).toFixed(1)} KB`"></p>
+              </div>
+            </div>
+            <button type="button" @click="removeFile(index)" class="text-red-500 hover:text-red-700">
+              <XIcon class="w-5 h-5" stroke-width={2.0} />
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-2 text-sm text-gray-500">
+    Upload your code collection. Our ferrets work in teams, covering every file and comparing notes.
+  </p>
+</div>

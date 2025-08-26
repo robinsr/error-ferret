@@ -65,17 +65,27 @@ const FOCUS_AREA_DESCRIPTIONS = {
 
 const DEFAULT_CONFIG: PromptConfig = {
   language: '',
-  focus: 'general',
+  selectedReviewers: ['general'],
   experienceLevel: 'apprentice'
 }
 
 export function generateSystemPrompt(config: PromptConfig = DEFAULT_CONFIG): string {
 
   const level = config.experienceLevel || 'experienced'
-  const focus = config.focus || 'performance'
+  const selectedReviewers = config.selectedReviewers || ['general']
 
   let levelItems = USER_LEVEL_DESCRIPTIONS[level].map((level) => `- ${level}`).join('\n');
-  let focusItems = FOCUS_AREA_DESCRIPTIONS[focus].map((focus) => `- ${focus}`).join('\n');
+
+  // Build focus area descriptions based on selected reviewers
+  let focusItems = '';
+  if (selectedReviewers.length === 1) {
+    const focus = selectedReviewers[0];
+    focusItems = FOCUS_AREA_DESCRIPTIONS[focus].map((focus) => `- ${focus}`).join('\n');
+  } else {
+    // Multiple reviewers - combine their focus areas
+    const allFocusAreas = selectedReviewers.flatMap(reviewer => FOCUS_AREA_DESCRIPTIONS[reviewer]);
+    focusItems = allFocusAreas.map((focus) => `- ${focus}`).join('\n');
+  }
 
   let lang = config.language || 'auto-detect';
 

@@ -1,4 +1,6 @@
 ---
+import { TAGLINES } from '@/branding';
+
 ---
 <div class="flex items-center justify-center mb-4">
   <img
@@ -11,8 +13,7 @@
       Error Ferret
     </h1>
     <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-      Sniffs out mistakes in your code with AI-powered line-by-line feedback powered by OpenAI.
-      Submit your code and receive detailed insights to improve your code quality.
+      {TAGLINES[Math.floor(Math.random() * TAGLINES.length)]}
     </p>
   </div>
 </div>

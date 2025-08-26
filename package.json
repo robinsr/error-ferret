@@ -17,9 +17,14 @@
     "@openai/openai": "jsr:^5.15.0",
     "@schoolai/ts-prompt": "jsr:^0.9.2",
     "@tailwindcss/vite": "^4.1.12",
+    "alpinejs": "^3.14.9",
     "astro": "^5.13.2",
     "openai": "^5.15.0",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/alpinejs": "^3.13.11",
+    "wrangler": "^4.32.0"
   }
 }

@@ -2,48 +2,51 @@
 export const prerender = false;
 
 import '@/styles/global.css';
-import { CODE_PLACEHOLDER, SUPPORTED_LANGUAGES, REVIEW_FOCUS_OPTIONS, EXPERIENCE_LEVEL_OPTIONS } from '@/constants';
+import { CODE_PLACEHOLDER, SUPPORTED_LANGUAGES, EXPERIENCE_LEVEL_OPTIONS } from '@/constants';
+import { WAIT_SCREEN } from '@/branding';
 import { generateFeedback } from '@/services/openai/feedback';
-import type { FeedbackItem as FeedbackItemType, PromptConfig, FocusArea, ExperienceLevel } from '@/types';
+import type { FeedbackItem as FeedbackItemType, PromptConfig } from '@/types';
+import { FERRET_REVIEWERS } from '@/reviewers';
 import Layout from '@/layouts/Layout.astro';
 import Section from '@/components/Section.astro';
 import Features from '@/components/Features.astro';
 import Header from '@/components/Header.astro';
 import SelectInput from '@/components/SelectInput.astro';
-import InputLabel from '@/components/InputLabel.astro';
 import TextareaInput from '@/components/TextareaInput.astro';
 import SubmitButton from '@/components/SubmitButton.astro';
 import Feedback from '@/components/Feedback.astro';
 import ErrorMsg from '@/components/Error.astro';
+import ReviewerSelector from '@/components/ReviewerSelector.astro';
+import FileUploadInput from '@/components/FileUploadInput.astro';
 
 
 let code = 'auto-detect';
-let language = '';
-let focus: FocusArea = 'general';
-let experienceLevel: ExperienceLevel = 'apprentice';
+
 let error = '';
 let feedbackItems: FeedbackItemType[] = [];
+let inputMode: 'paste' | 'upload' = 'paste';
 
 if (Astro.request.method === 'POST') {
-  const formData = await Astro.request.formData();
+  // const formData = await Astro.request.formData();
 
-  code = formData.get('code') as string;
-  language = formData.get('language') as string;
-  focus = formData.get('focus') as FocusArea;
-  experienceLevel = formData.get('experienceLevel') as ExperienceLevel;
+  // code = formData.get('code') as string;
+  // language = formData.get('language') as string;
+  // const reviewersData = formData.get('selectedReviewers') as string;
+  // selectedReviewers = reviewersData ? reviewersData.split(',').filter(r => r.trim()) as FocusArea[] : ['general'];
+  // experienceLevel = formData.get('experienceLevel') as ExperienceLevel;
 
-  const config: PromptConfig = { language, focus, experienceLevel };
+  // const config: PromptConfig = { language, selectedReviewers, experienceLevel };
 
-  // console.debug('POST data:', { code, language, focus, experienceLevel });
+  // // console.debug('POST data:', { code, language, selectedReviewers, experienceLevel });
 
-  try {
-    feedbackItems = await generateFeedback(code, config);
-  } catch (e) {
-    console.error('Error:', error);
+  // try {
+  //   feedbackItems = await generateFeedback(code, config);
+  // } catch (e) {
+  //   console.error('Error:', error);
 
-    error = e instanceof Error ? e.message : 'An unknown error occurred';
-    feedbackItems = [];
-  }
+  //   error = e instanceof Error ? e.message : 'An unknown error occurred';
+  //   feedbackItems = [];
+  // }
 }
 
 const hasFeedbackItems = feedbackItems.length > 0;
@@ -60,41 +63,49 @@ const hasError = error !== '';
       <!-- Main Form -->
        <Section title="Submit Code for Review" description="Paste your code below and get instant feedback" colorScheme="blue">
 
-        <form id="reviewForm" method="POST" class="p-8 space-y-6">
-          <!-- Code Input Section -->
-          <div>
-            <InputLabel name="code" label="Code to Review" />
-
-            <div class="relative">
-              <TextareaInput name="code" label="Code to Review" content={code} placeholder={CODE_PLACEHOLDER} />
-
-              <!-- Pseudo-console traffic light buttons -->
-              <div class="absolute top-3 right-3">
-                <div class="flex space-x-1">
-                  <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-              </div>
+        <form id="reviewForm" class="p-8 space-y-6" enctype="multipart/form-data" x-data="formDataModel">
+          <!-- Input Mode Toggle -->
+          <div class="flex justify-center">
+            <div class="bg-gray-100 p-1 rounded-lg flex">
+              <button
+                type="button"
+                @click="switchToPasteMode"
+                :class="inputMode === 'paste' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                class="px-6 py-2 rounded-md font-medium transition-all duration-200"
+              >
+                Paste your code
+              </button>
+              <button
+                type="button"
+                @click="switchToUploadMode"
+                :class="inputMode === 'upload' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                class="px-6 py-2 rounded-md font-medium transition-all duration-200"
+              >
+                Upload files
+              </button>
             </div>
-
-            <p class="mt-2 text-sm text-gray-500">
-              Supports all major programming languages. The AI will analyze your code and provide detailed feedback.
-            </p>
           </div>
 
-          <!-- Language and Focus Selection -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <SelectInput options={SUPPORTED_LANGUAGES} label="Programming Language (Optional)" name="language" selectedValue={language} />
-            <SelectInput options={REVIEW_FOCUS_OPTIONS} label="Review Focus" name="focus" selectedValue={focus} />
-            <SelectInput options={EXPERIENCE_LEVEL_OPTIONS} label="Experience Level" name="experienceLevel" selectedValue={experienceLevel} />
+          <!-- Code Input Section -->
+          <div x-show="inputMode === 'paste'" x-transition>
+            <TextareaInput name="code" label="Code to Review" content={code} placeholder={CODE_PLACEHOLDER} />
           </div>
+
+          <!-- File Upload Section -->
+          <div x-show="inputMode === 'upload'" x-transition>
+            <FileUploadInput />
+          </div>
+
+          <!-- Reviewer Selection -->
+          <ReviewerSelector reviewers={FERRET_REVIEWERS} />
 
           <div class="flex items-center justify-center pt-4">
             <SubmitButton />
           </div>
         </form>
       </Section>
+
+      <Features />
 
       {hasFeedbackItems && (
         <Section title="Feedback" description="AI-powered line-by-line feedback" colorScheme="green">
@@ -113,7 +124,7 @@ const hasError = error !== '';
         <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
           <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <h3 class="text-xl font-semibold text-gray-900 mb-2">Processing Your Code</h3>
-          <p class="text-gray-600">Please wait while AI analyzes your code. This may take up to 1 minute...</p>
+          <p class="text-gray-600">{WAIT_SCREEN}</p>
         </div>
       </div>
 
@@ -122,6 +133,63 @@ const hasError = error !== '';
 </Layout>
 
 <script>
+  import Alpine from 'alpinejs';
+  import type { FerretReviewer } from '@/reviewers';
+
+  type InputMode = 'paste' | 'upload';
+
+  document.addEventListener('alpine:init', () => {
+    // Alpine.store('')
+
+    Alpine.data('formDataModel', () => formDataModel())
+  })
+
+  function formDataModel() {
+    return {
+      inputMode: 'paste' as InputMode,
+      selectedFiles: [] as File[],
+      reviewers: [
+        'general'
+      ],
+
+      switchToPasteMode() {
+        this.inputMode = 'paste';
+      },
+
+      addReviewer(reviewer: FerretReviewer) {
+        this.reviewers.push(reviewer.focus);
+      },
+
+      removeReviewer(reviewer: FerretReviewer) {
+        this.reviewers = this.reviewers.filter(r => r !== reviewer.focus);
+      },
+
+      switchToUploadMode() {
+        this.inputMode = 'upload';
+      },
+
+      handleFileSelection(input: HTMLInputElement) {
+        if (input.files) {
+          this.selectedFiles = Array.from(input.files);
+        }
+      },
+
+      removeFile(index: number) {
+        this.selectedFiles.splice(index, 1);
+
+        // Update the file input
+        const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+        if (fileInput) {
+          const dt = new DataTransfer();
+          this.selectedFiles.forEach(file => dt.items.add(file));
+          fileInput.files = dt.files;
+        }
+      }
+    }
+  }
+
+
+  // Form submission handling
   const form = document.getElementById('reviewForm');
   const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
   const buttonText = document.getElementById('buttonText');
