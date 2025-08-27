@@ -1,9 +1,5 @@
 ---
-import '@/styles/global.css';
-
-import { ClientRouter } from "astro:transitions";
-
-import { PAGE_TITLES } from '@/branding';
+import { PAGE_TITLES } from '@errorferret/branding';
 
 interface Props {
   title?: string
@@ -21,22 +17,9 @@ const title = `Error Ferret - ${Astro.props.title ?? PAGE_TITLES[0]}`;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-		<ClientRouter />
 	</head>
 	<body>
 		<slot />
-
-		<!-- Alpine.js -->
-		<script>
-			import Alpine from 'alpinejs';
-
-      document.addEventListener('astro:page-load',() => {
-        window.Alpine = Alpine;
-        Alpine.start();
-        console.log(window.Alpine);
-        console.log("Alpine loaded");
-      });
-		</script>
 	</body>
 </html>
 

@@ -11,14 +11,19 @@
   ],
   "scripts": {
     "ci:install": "pnpm install --frozen-lockfile",
-    "build": "pnpm -r --filter @errorferret/types --filter @errorferret/api --filter @errorferret/worker --filter @errorferret/web --filter @errorferret/app run build",
+
+    "build": "pnpm -r run build",
+
     "dev": "pnpm -r --parallel --filter=@errorferret/api --filter=@errorferret/worker --filter=@errorferret/web --filter=@errorferret/app run dev",
     "dev:app": "pnpm --filter @errorferret/app run dev",
     "dev:web": "pnpm --filter @errorferret/web run dev",
     "dev:api": "pnpm --filter @errorferret/api run dev",
     "dev:worker": "pnpm --filter @errorferret/worker run dev",
+
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+
+    "build:site": "pnpm -r --filter=@errorferret/app --filter=@errorferret/web run build && rm -rf apps/web/public/app && cp -R apps/app/dist apps/web/public/app"
   },
   "devDependencies": {
     "typescript": "^5.5.4",

@@ -11,8 +11,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@errorferret/branding": "workspace:*",
+    "@errorferret/reviewers": "workspace:*",
+    "@errorferret/constants": "workspace:*",
+    "@errorferret/ui-react": "workspace:*",
+    "@tailwindcss/vite": "^4.1.12",
+    "lucide-react": "0.542.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
