@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: error-ferret
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/robinsr/error-ferret-api
+    newTag: prod
+  - name: ghcr.io/robinsr/error-ferret-worker
+    newTag: prod
+  - name: ghcr.io/robinsr/error-ferret-web
+    newTag: prod
+
+patches:
+  # example: dev host
+  - target: { kind: HTTPRoute, name: error-ferret }
+    patch: |-
+      - op: replace
+        path: /spec/hostnames/0
+        value: errorferret.prod.local

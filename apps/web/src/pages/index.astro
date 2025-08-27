@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import Layout from '@/layouts/Layout.astro';
+import App from '@react/App.tsx'
 
 let error = '';
 const hasError = error !== '';
@@ -9,7 +10,7 @@ const hasError = error !== '';
 <Layout>
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-6xl mx-auto flex flex-col gap-8">
-        <div id="root"></div>
+        <App client:load />
     </div>
   </div>
 </Layout>

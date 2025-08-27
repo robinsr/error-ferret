@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "strict": true,
+    "jsx": "react-jsx",
+    "sourceMap": false,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

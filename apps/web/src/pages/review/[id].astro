@@ -1,0 +1,51 @@
+---
+export const prerender = false
+
+import '@/styles/global.css';
+
+import type { Review, FeedbackItem as FeedbackItemType } from '@errorferret/types'
+import Layout from '@/layouts/Layout.astro'
+import Header from '@react-components/Header.tsx'
+import Section from '@react-components/Section.tsx'
+import FeedbackItem from '@react-components/ReviewFeedback/FeedbackItem.tsx'
+
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
+
+const fetchReview = async (id: string): Promise<Review> => {
+  const response = await fetch(`${API_BASE}/api/reviews/${id}`)
+  return response.json()
+}
+
+const requestId = Astro.params.id as string
+const review = await fetchReview(requestId)
+const feedbackItems: FeedbackItemType[] = [] // review.feedback
+
+---
+<Layout>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto flex flex-col gap-8">
+        <Header />
+
+        <Section
+          title="Review Feedback"
+          description={`Showing feedback for review ${requestId}`}
+        >
+        <div class="px-4 py-8">
+          <pre>{JSON.stringify(review, null, 4)}</pre>
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            {feedbackItems.map((item) => (
+              <p>{item.feedback}</p>
+            ))}
+          </div>
+
+
+        </div>
+
+        </Section>
+      </div>
+    </div>
+</Layout>

@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+
+kind: Ingress
+
+metadata:
+  name: error-ferret
+  namespace: error-ferret
+  annotations:
+    # Optional: longer timeouts for API if needed
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: errorferret.dev.local
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80

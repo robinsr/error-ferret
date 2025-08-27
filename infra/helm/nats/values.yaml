@@ -1,0 +1,15 @@
+nats:
+  jetstream:
+    enabled: true
+    fileStore:
+      pvc:
+        enabled: true
+        size: 10Gi
+service:
+  type: ClusterIP
+config:
+  cluster:
+    enabled: false
+  monitoring:
+    enabled: true
+    port: 8222

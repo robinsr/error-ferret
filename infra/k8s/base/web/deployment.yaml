@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: error-ferret
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: web } }
+  template:
+    metadata: { labels: { app: web } }
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/robinsr/error-ferret-web:{{TAG}}  # built Astro site
+          ports: [{ containerPort: 4321 }]
+          resources:
+            requests: { cpu: "25m", memory: "64Mi" }
+            limits:   { cpu: "100m", memory: "128Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: error-ferret
+spec:
+  selector: { app: web }
+  ports:
+    - name: http
+      port: 80
+      targetPort: 4321

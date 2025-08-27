@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: error-ferret
+data:
+  NATS_URL: nats://nats.error-ferret.svc.cluster.local:4222

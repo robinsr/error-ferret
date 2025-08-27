@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: error-ferret
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: worker } }
+  template:
+    metadata: { labels: { app: worker } }
+    spec:
+      containers:
+        - name: worker
+          image: ghcr.io/robinsr/error-ferret-worker:{{TAG}}
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef: { name: api-config, key: NATS_URL }
+            - name: API_BASE
+              value: "http://api.error-ferret.svc.cluster.local"
+          envFrom:
+            - secretRef: { name: openai-secret }
+          resources:
+            requests: { cpu: "50m", memory: "128Mi" }
+            limits:   { cpu: "500m", memory: "512Mi" }

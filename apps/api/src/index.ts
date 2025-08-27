@@ -1,8 +1,9 @@
+import type { CreateReviewRequest, CreateReviewResponse, Review } from '@errorferret/types';
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors'
 import { connect, StringCodec } from 'nats';
 import { randomUUID } from 'node:crypto';
-import type { CreateReviewResponse, ReviewStatus } from '@errorferret/types';
 
 
 // The port the API server is running on (3000)
@@ -12,7 +13,7 @@ const PORT = Number(process.env.PORT || 3000);
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 
 // naive in-memory store for MVP.
-const reviews = new Map<string, ReviewStatus>();
+const reviews = new Map<string, Review>();
 
 const start = async () => {
 
@@ -33,21 +34,52 @@ const start = async () => {
     servers: NATS_URL
   });
 
-
   const sc = StringCodec();
+
+  const createReview = async (request: CreateReviewRequest): Promise<CreateReviewResponse> => {
+    const reviewId = randomUUID();
+    const review: Review = {
+      reviewId,
+      status: 'creating',
+      submission: request,
+      feedback: []
+    }
+
+    await nc.publish('reviews.pending', sc.encode(JSON.stringify(review)));
+
+    reviews.set(reviewId, review);
+
+    return { reviewId };
+  }
+
+  const getReview = async (reviewId: string): Promise<Review> => {
+    if (reviews.has(reviewId)) {
+      return reviews.get(reviewId)!
+    } else {
+      return {
+        reviewId,
+        status: 'idle',
+        submission: { reviewers: [], artifacts: [] },
+        feedback: []
+      }
+    }
+  }
+
+  const updateReview = async (reviewId: string, review: Review) => {
+    reviews.set(reviewId, review);
+  }
 
   server.get('/healthz', async () => ({ ok: true }));
 
   // Create a review → enqueue message
   server.post('/api/reviews', async (req, reply) => {
-    const reviewId = randomUUID();
-    reviews.set(reviewId, { reviewId, status: 'pending' });
-
-    const payload = { reviewId };
-    await nc.publish('reviews.pending', sc.encode(JSON.stringify(payload)));
-
-    const res: CreateReviewResponse = { reviewId };
-    return reply.code(201).send(res);
+    try {
+      const response = await createReview(req.body as CreateReviewRequest);
+      return reply.code(201).send(response);
+    } catch (err) {
+      console.error(err);
+      return reply.code(500).send({ error: 'internal_server_error' });
+    }
   });
 
   // Submit (placeholder for when files exist)
@@ -61,17 +93,28 @@ const start = async () => {
   // Poll status
   server.get('/api/reviews/:id', async (req, reply) => {
     const id = (req.params as any).id as string;
-    const status = reviews.get(id);
-    if (!status) return reply.code(404).send({ error: 'not_found' });
-    return reply.send(status);
+
+    try {
+      const review = await getReview(id);
+      return reply.send(review);
+    } catch (err) {
+      console.error(err);
+      return reply.code(500).send({ error: 'internal_server_error' });
+    }
   });
 
   // allow worker to write back results (MVP, trust local)
   server.post('/internal/reviews/:id/complete', async (req, reply) => {
     const id = (req.params as any).id as string;
-    if (!reviews.has(id)) return reply.code(404).send({ error: 'not_found' });
-    const body = (req.body ?? {}) as Omit<ReviewStatus, 'reviewId'>;
-    reviews.set(id, { reviewId: id, ...body });
+
+    if (!reviews.has(id)) {
+      return reply.code(404).send({ error: 'not_found' });
+    }
+
+    const body = (req.body ?? {}) as Omit<Review, 'reviewId'>;
+
+    await updateReview(id, { reviewId: id, ...body });
+
     return reply.send({ ok: true });
   });
 

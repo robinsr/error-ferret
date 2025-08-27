@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: worker-jetstream
+  namespace: error-ferret
+spec:
+  scaleTargetRef:
+    name: worker
+  cooldownPeriod: 60
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    - type: nats-jetstream
+      metadata:
+        natsServerMonitoringEndpoint: "http://nats.monitoring.svc.cluster.local:8222"
+        account: "$G"                      # default account
+        stream: "REVIEWS"                  # your JetStream stream name
+        consumer: "worker"                 # durable consumer name
+        lagThreshold: "10"                 # scale when lag > 10

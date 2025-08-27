@@ -1,31 +1,52 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react'
-import cloudflare from '@astrojs/cloudflare';
+import node from '@astrojs/node'
 import tailwindcss from '@tailwindcss/vite';
+import { fileURLToPath } from 'node:url';
 
 
 const noExternal = [
   '@errorferret/branding',
   '@errorferret/reviewers',
   '@errorferret/constants',
-  '@errorferret/ui-react',
+  '@errorferret/env-node',
 ];
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare(),
+  adapter: node({
+    mode: 'standalone'
+  }),
+  integrations: [
+    react()
+  ],
   vite: {
-    plugins: [tailwindcss()],
-    ssr: { noExternal },
-    optimizeDeps: { include: noExternal },
+    plugins: [
+      tailwindcss()
+    ],
+    ssr: {
+      noExternal
+    },
+    optimizeDeps: {
+      exclude: noExternal
+    },
     server: {
-      proxy: {
-        // everything under /app served by the SPA dev server
-        '/app': 'http://localhost:4322'
-      }
+      fs: {
+        allow: [
+          fileURLToPath(new URL('.', import.meta.url)),           // apps/web
+          fileURLToPath(new URL('../../', import.meta.url)),      // monorepo root (gives access to packages/*)
+        ],
+      },
+    },
+    resolve: {
+      alias: {
+        // Nice local aliases for your moved React code
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@react': fileURLToPath(new URL('./src/react', import.meta.url)),
+        '@react-components': fileURLToPath(new URL('./src/react/components', import.meta.url)),
+      },
     },
   },
-  integrations: [react()]
 });

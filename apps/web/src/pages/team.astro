@@ -2,74 +2,60 @@
 import '@/styles/global.css';
 
 import Layout from '@/layouts/Layout.astro';
-import { Section, Header } from '@errorferret/ui-react';
+import Section from '@react-components/Section.tsx'
+import Header from '@react-components/Header.tsx'
 import { FERRET_REVIEWERS } from '@errorferret/reviewers';
 ---
 
-<Layout title="Meet the Team"=>
+<Layout title="Meet the Team">
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto flex flex-col gap-8">
       <Header />
 
-      <!-- Team Page Header -->
-      <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Meet the Team</h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          Our AI-powered code reviewers are ready to analyze your code with their unique perspectives and expertise.
-        </p>
-      </div>
 
-      <!-- Reviewers Grid -->
-      <div class="space-y-12">
-        {FERRET_REVIEWERS.map((reviewer, index) => {
-          const isEven = index % 2 === 0;
-          return (
-            <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-              <!-- Avatar Section -->
-              <div class="flex-shrink-0">
-                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
-                  <img
-                    src={reviewer.image}
-                    alt={`${reviewer.name} avatar`}
-                    class="w-full h-full object-cover"
-                    onerror="this.src='./images/ferret_avatar.jpg'"
-                  />
+      <Section
+        title="Meet the Team"
+        description="Meet our trained ferret reviewers — each with a distinct focus, all dedicated to improving your code."
+        linkUrl="./"
+        linkText="← Back"
+      >
+
+        <!-- Reviewers Grid -->
+        <div class="space-y-12 py-12 px-20">
+          {FERRET_REVIEWERS.map((reviewer, index) => {
+            const isEven = index % 2 === 0;
+            return (
+              <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+
+                <div class="flex-shrink-0">
+                  <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
+                    <img
+                      src={reviewer.imageUrl}
+                      alt={`${reviewer.name} avatar`}
+                      class="w-full h-full object-cover"
+                      onerror="this.src='./images/ferret_avatar.jpg'"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <!-- Content Section -->
-              <div class="flex-1 text-center lg:text-left">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">
-                  {reviewer.name} the {reviewer.title}
-                </h2>
-                <p class="text-lg text-gray-600 mb-4 italic">
-                  "{reviewer.personality}"
-                </p>
-                <div class="prose prose-lg text-gray-700 max-w-none">
-                  <p class="text-base leading-relaxed">
-                    {reviewer.backstory}
+                <div class="flex-1 text-center lg:text-left">
+                  <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                    {reviewer.name} the {reviewer.title}
+                  </h2>
+                  <p class="text-lg text-gray-600 mb-4 italic">
+                    "{reviewer.personality}"
                   </p>
+                  <div class="prose prose-lg text-gray-700 max-w-none">
+                    <p class="text-base leading-relaxed">
+                      {reviewer.backstory}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <!-- Call to Action -->
-      <Section title="Ready to Get Reviewed?" description="Send your code to our team of expert reviewers" colorScheme="blue">
-        <div class="text-center">
-          <p class="text-lg text-gray-600 mb-6">
-            Choose one or more reviewers based on what you want to focus on, and get comprehensive feedback on your code.
-          </p>
-          <a
-            href="/"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-          >
-            Submit Code for Review
-          </a>
+            );
+          })}
         </div>
-      </Section>
-    </div>
+      </div>
+    </Section>
   </div>
 </Layout>

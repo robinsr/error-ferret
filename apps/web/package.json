@@ -8,6 +8,7 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "start": "node ./dist/server/entry.mjs",
     "deploy": "npm run build && wrangler deploy",
     "astro": "astro",
     "lint": "eslint .",
@@ -16,20 +17,25 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/cloudflare": "^12.6.4",
+    "@astrojs/node": "9.4.3",
     "@astrojs/react": "4.3.0",
     "@errorferret/branding": "workspace:*",
     "@errorferret/constants": "workspace:*",
+    "@errorferret/env-node": "workspace:*",
     "@errorferret/reviewers": "workspace:*",
-    "@errorferret/ui-react": "workspace:*",
+    "@errorferret/types": "workspace:*",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.2",
     "lucide-astro": "0.542.0",
+    "lucide-react": "0.542.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
     "typescript": "^5.5.4",
     "wrangler": "^4.32.0"
   }

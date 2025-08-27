@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: error-ferret
+  namespace: error-ferret
+spec:
+  parentRefs:
+    - name: public-gateway        # pre-existing Gateway
+      namespace: gateway
+  hostnames:
+    - errorferret.dev.example.com
+  rules:
+    - matches: [{ path: { type: PathPrefix, value: "/" } }]
+      backendRefs: [{ name: web, port: 80 }]
+    - matches: [{ path: { type: PathPrefix, value: "/api" } }]
+      backendRefs: [{ name: api, port: 80 }]
