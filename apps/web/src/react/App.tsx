@@ -15,9 +15,7 @@ import TextareaInput from '@react-components/InputForm/TextareaInput'
 import ReviewerSelector from '@react-components/InputForm/ReviewerSelector'
 import FileUploadInput from '@react-components/InputForm/FileUploadInput'
 
-import { CODE_PLACEHOLDER } from '@errorferret/constants'
 import { FERRET_REVIEWERS } from '@errorferret/reviewers'
-
 
 
 type InputMode = 'paste' | 'upload'
@@ -25,7 +23,6 @@ type InputMode = 'paste' | 'upload'
 export default function App() {
   const [reviewId, setReviewId] = useState<string | null>(null)
   const [status, setStatus] = useState<ReviewStatus>('idle')
-  const [items, setItems] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [inputMode, setInputMode] = useState<InputMode>('paste')
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -35,14 +32,11 @@ export default function App() {
   )
 
   const [code, setCode] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
-  async function start() {
+  async function onSubmit() {
     setIsSubmitting(true)
-    setIsLoading(true)
     setError(null)
-    setItems([])
     setStatus('creating')
 
     try {
@@ -66,8 +60,8 @@ export default function App() {
 
         setStatus(review.status)
 
-        if (review.status === 'complete' && review.feedback) {
-          setItems(review.feedback)
+        if (review.status === 'complete') {
+          window.location.href = `/review/${reviewId}`
         }
 
         if (review.status === 'failed') {
@@ -97,7 +91,7 @@ export default function App() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    start()
+    onSubmit()
   }
 
   return (
@@ -137,7 +131,7 @@ export default function App() {
             </div>
 
             {inputMode == 'paste' && (
-              <TextareaInput name="code" label="Code to Review" placeholder={CODE_PLACEHOLDER} onChange={setCode} />
+              <TextareaInput name="code" label="Code to Review" onChange={setCode} />
             )}
 
             {inputMode == 'upload' && (

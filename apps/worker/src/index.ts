@@ -1,24 +1,53 @@
 import { connect, StringCodec } from 'nats';
 import { setTimeout as delay } from 'node:timers/promises';
-import type { FeedbackItem, ReviewStatus } from '@errorferret/types';
+import type { Review,ReviewFeedbackItem, ReviewStatus } from '@errorferret/types';
+
+import { FERRET_REVIEWERS } from '@errorferret/reviewers';
 
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const API_BASE = process.env.API_BASE || 'http://localhost:3000';
 const sc = StringCodec();
 
-async function fakeLLM(reviewId: string): Promise<FeedbackItem[]> {
+
+const fakeFeedbackItems: ReviewFeedbackItem[] = FERRET_REVIEWERS.map(reviewer => ({
+  comment: "Do logging throughout the code, remove debug logging",
+  severity: "high",
+  reviewer: reviewer,
+  location: {
+    filename: "app/controllers/users_controller.rb",
+    lineNumber: 10
+  },
+  context: {
+    filename: "app/controllers/users_controller.rb",
+    lines: [
+      { lineNumber: 6, code: "class ApplicationController < ActionController::Base" },
+      { lineNumber: 7, code: "class ApplicationController < ActionController::Base" },
+      { lineNumber: 8, code: "class UsersController < ApplicationController" },
+      { lineNumber: 9, code: "def index" },
+      { lineNumber: 10, code: "def index" },
+      { lineNumber: 11, code: "def show" },
+      { lineNumber: 12, code: "def create" }
+    ]
+  }
+}))
+
+async function fakeLLM(review: Review): Promise<ReviewFeedbackItem[]> {
   // MVP: generate deterministic, obviously-fake items
-  return [
-    {
-      line: 1,
-      column: 1,
-      code_snippet: "const x = 1;",
-      issue: "Example issue",
-      suggestion: "Example suggestion",
-      severity: "info",
-      persona: "plain"
-    }
-  ];
+  return fakeFeedbackItems
+}
+
+async function onPendingReview(review: Review): Promise<Review> {
+  console.log('processing', review.id);
+
+  // simulate processing
+  await delay(2000);
+
+  const items = await fakeLLM(review);
+
+  review.feedback = items;
+  review.status = 'complete';
+
+  return review;
 }
 
 async function run() {
@@ -28,27 +57,19 @@ async function run() {
 
   for await (const m of sub) {
     try {
-      const msg = JSON.parse(sc.decode(m.data)) as { reviewId: string };
-      const { reviewId } = msg;
-      console.log('processing', reviewId);
+      const review = JSON.parse(sc.decode(m.data)) as Review
+      const result = await onPendingReview(review);
 
-      // simulate processing
-      await delay(200);
-      const items = await fakeLLM(reviewId);
-
-      const complete: Omit<ReviewStatus, 'reviewId'> = {
-        status: 'complete',
-        items
-      };
-
-      const res = await fetch(`${API_BASE}/internal/reviews/${reviewId}/complete`, {
+      const res = await fetch(`${API_BASE}/internal/reviews/${review.id}/complete`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(complete)
+        body: JSON.stringify(result)
       });
 
-      if (!res.ok) throw new Error(`callback failed: ${res.status}`);
-      console.log('completed', reviewId);
+      if (!res.ok) {
+        throw new Error(`callback failed: ${res.status}`);
+      }
+      console.log('completed', review.id);
     } catch (e) {
       console.error('worker error', e);
     }

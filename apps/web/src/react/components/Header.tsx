@@ -12,11 +12,13 @@ const Header: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center mb-4">
-      <img
-        src="/images/ferret_clipped.png"
-        alt="Error Ferret Logo"
-        className="w-70 h-45 mr-4"
-      />
+      <a href="/">
+        <img
+          src="/images/ferret_clipped.png"
+          alt="Error Ferret Logo"
+          className="w-70 h-45 mr-4"
+        />
+      </a>
       <div className="flex flex-col items-start">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
           Error Ferret

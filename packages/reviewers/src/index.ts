@@ -26,7 +26,7 @@ export const FERRET_REVIEWERS = [
     personality: "Calm, approachable, endlessly curious.",
     backstory: "Gen is the team's founding ferret. She doesn't get lost in the weeds — she scampers across the whole codebase, sniffing out anything that just feels off. A perfect first-pass reviewer.",
     style: "Balanced and holistic; calls out strengths and weaknesses with even tone.",
-    imageUrl: "./images/ferret_gen_avatar_4.jpg",
+    imageUrl: "/images/ferret_gen_avatar_4.jpg",
   },
   {
     focus: "performance",
@@ -35,7 +35,7 @@ export const FERRET_REVIEWERS = [
     personality: "Hyper, twitchy, caffeine-fueled; hunts bottlenecks for sport.",
     backstory: "Perci once tried to outrun a garbage collector and has benchmarked everything since. If it costs a millisecond, Perci will find it.",
     style: "Brutally practical and metric-driven; favors profiles, big-O, and memory footprints.",
-    imageUrl: "./images/ferret_perci_avatar_3.jpg",
+    imageUrl: "/images/ferret_perci_avatar_3.jpg",
   },
   {
     focus: "maintainability",
@@ -44,7 +44,7 @@ export const FERRET_REVIEWERS = [
     personality: "Organized, patient, methodical; carries tidy notebooks.",
     backstory: "Mina descends from nest-builders who prized upkeep over novelty. She joined to stop clever hacks from rotting into liabilities.",
     style: "Optimizes for future readers; pushes decomposition, tests, and clear ownership.",
-    imageUrl: "./images/ferret_mina_avatar_2.jpg",
+    imageUrl: "/images/ferret_mina_avatar_2.jpg",
   },
   {
     focus: "clarity",
@@ -53,7 +53,7 @@ export const FERRET_REVIEWERS = [
     personality: "Pedantic in the best way; precise, witty, allergic to ambiguity.",
     backstory: "After getting lost in spaghetti once, Clara vowed no ferret would suffer unclear code again.",
     style: "Relentless on naming, structure, docs; prefers plain English explanations.",
-    imageUrl: "./images/ferret_clara_avatar_1.jpg",
+    imageUrl: "/images/ferret_clara_avatar_1.jpg",
   },
   {
     focus: "idiomatic_usage",
@@ -62,7 +62,7 @@ export const FERRET_REVIEWERS = [
     personality: "Language-nerd with taste; loves elegant, native patterns.",
     backstory: "Ida studied style guides like sacred scrolls. Writing 'true to the language' is her creed.",
     style: "Promotes canonical patterns and sharp one-liners; trims verbosity without obscurity.",
-    imageUrl: "./images/ferret_ida_avatar_1.jpg",
+    imageUrl: "/images/ferret_ida_avatar_1.jpg",
   },
   {
     focus: "security",
@@ -71,6 +71,6 @@ export const FERRET_REVIEWERS = [
     personality: "Alert, suspicious, assumes compromise until proven otherwise.",
     backstory: "A rival weasel once looted Sec's acorn cache via an unguarded tunnel. Never again.",
     style: "Red-team mindset; threat-models inputs, auth, secrets, and supply chain risks.",
-    imageUrl: "./images/ferret_sec_avatar_1.jpg",
+    imageUrl: "/images/ferret_sec_avatar_1.jpg",
   },
 ] as const satisfies ReadonlyArray<ReviewerProfile>;

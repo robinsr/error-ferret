@@ -1,9 +1,14 @@
 import React from 'react';
 
+const CODE_PLACEHOLDER = `// Paste your code here...
+// Example:
+function calculateSum(a, b) {
+    return a + b;
+}`;
+
 interface Props {
   name: string;
   label: string;
-  placeholder?: string;
   required?: boolean;
   onChange?: (value: string) => void;
 }
@@ -11,7 +16,6 @@ interface Props {
 const TextareaInput: React.FC<Props> = ({
   name,
   label,
-  placeholder = '',
   required = true,
   onChange
 }) => {
@@ -39,7 +43,7 @@ const TextareaInput: React.FC<Props> = ({
           name={name}
           rows={20}
           required={required}
-          placeholder={placeholder}
+          placeholder={CODE_PLACEHOLDER}
           onChange={handleChange}
           className={cls}
         />

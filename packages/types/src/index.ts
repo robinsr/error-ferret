@@ -5,7 +5,7 @@ import type { ReviewerProfile, ReviewerFocus } from '@errorferret/reviewers';
 //
 
 export type Review = {
-  reviewId: string;
+  id: string;
   status: ReviewStatus;
   submission: ReviewSubmission;
   feedback: ReviewFeedbackItem[];
@@ -39,17 +39,59 @@ export type ReviewArtifactRaw = {
 // Data Models - Feedback
 //
 
-export type ReviewItemSeverity = 'low' | 'medium' | 'high'
+/* {
+  comment: "Do logging throughout the code, remove debug logging",
+  severity: "high",
+  reviewer: {
+    name: "Gen",
+    title: "Generalist",
+    focus: "general",
+    imageUrl: "images/ferret_gen_avatar_4.jpg"
+  },
+  location: {
+    filename: "app/controllers/users_controller.rb",
+    lineNumber: 10
+  },
+  context: {
+    filename: "app/controllers/users_controller.rb",
+    lines: [
+      { lineNumber: 6, code: "class ApplicationController < ActionController::Base" },
+      { lineNumber: 7, code: "class ApplicationController < ActionController::Base" },
+      { lineNumber: 8, code: "class UsersController < ApplicationController" },
+      { lineNumber: 9, code: "def index" },
+      { lineNumber: 10, code: "def index" },
+      { lineNumber: 11, code: "def show" },
+      { lineNumber: 12, code: "def create" }
+    ]
+  }
+} */
 
 export type ReviewFeedbackSource = Pick<ReviewerProfile, 'name' | 'title' | 'focus' | 'imageUrl'>
 
 export type ReviewFeedbackItem = {
-  line: number;
-  column: number;
-  code_snippet: string;
   comment: string;
-  severity: ReviewItemSeverity;
+  severity: ReviewItemSeverity
   reviewer: ReviewFeedbackSource;
+  location: TextFileLocation;
+  context: FeedbackContext;
+}
+
+export type ReviewItemSeverity = 'low' | 'medium' | 'high';
+
+export type FeedbackContext = {
+  filename?: string;
+  lines: FeedbackContextLine[]
+}
+
+export type FeedbackContextLine = {
+  lineNumber: number;
+  code: string;
+}
+
+export type TextFileLocation = {
+  lineNumber: number;
+  columnNumber?: number;
+  filename?: string;
 }
 
 //
@@ -78,40 +120,62 @@ export type GetReviewResponse = {
 /**
  * Defines the structure of the response from the LLM (as described in the system prompt)
  */
-export type LLMResponseItem = {
-  file: string;
-  line: string;
-  lineNumber: number;
-  reviewer: ReviewerProfile;
-  feedback: string;
-}
+// export type LLMResponseItem = {
+//   file: string;
+//   line: string;
+//   lineNumber: number;
+//   reviewer: ReviewerProfile;
+//   feedback: string;
+// }
 
 /**
  * Defines a single feedback item, parsed from the LLM response
  */
-export type FeedbackItem = {
-  lineNum: number;
-  columnNum: number;
-  code: string;
-  contextLines: CodeReference[];
-  feedback: string;
-}
+// export type LLMFeedbackItem = {
+//   lineNum: number;
+//   columnNum: number;
+//   code: string;
+//   contextLines: LLMCodeReference[];
+//   feedback: string;
+// }
 
 /**
  * Defines the structure of the response from the feedback service
  */
-export type FeedbackResponse = {
-  feedbackItems: FeedbackItem[];
-  language: string;
-  focus: string;
-  timestamp: string;
-}
-
+// export type LLMFeedbackResponse = {
+//   feedbackItems: LLMFeedbackItem[];
+//   language: string;
+//   focus: string;
+//   timestamp: string;
+// }
 
 /**
  * Defines a reference to a line of user code, used to display the context of the feedback
  */
-export type CodeReference = {
-  lineNum: number;
-  code: string;
+// export type LLMCodeReference = {
+//   lineNum: number;
+//   code: string;
+// }
+
+/*
+// Parse the user's code into identifiable lines
+{
+  "file": "src/foo.ts",
+  "lines": [
+    {"id":"L-2c7f","n":41,"text":"const cache = new Map<string, User>();"},
+    {"id":"L-88b1","n":42,"text":"export async function getUser(id: string) {"},
+    ...
+  ]
+}
+*/
+
+export type CodeFile = {
+  filename: string;
+  lines: CodeLine[];
+}
+
+export type CodeLine = {
+  id: string;
+  num: number;
+  text: string;
 }

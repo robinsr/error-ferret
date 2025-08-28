@@ -37,9 +37,9 @@ const start = async () => {
   const sc = StringCodec();
 
   const createReview = async (request: CreateReviewRequest): Promise<CreateReviewResponse> => {
-    const reviewId = randomUUID();
+    const id = randomUUID();
     const review: Review = {
-      reviewId,
+      id,
       status: 'creating',
       submission: request,
       feedback: []
@@ -47,9 +47,9 @@ const start = async () => {
 
     await nc.publish('reviews.pending', sc.encode(JSON.stringify(review)));
 
-    reviews.set(reviewId, review);
+    reviews.set(id, review);
 
-    return { reviewId };
+    return { reviewId:id };
   }
 
   const getReview = async (reviewId: string): Promise<Review> => {
@@ -57,7 +57,7 @@ const start = async () => {
       return reviews.get(reviewId)!
     } else {
       return {
-        reviewId,
+        id: reviewId,
         status: 'idle',
         submission: { reviewers: [], artifacts: [] },
         feedback: []
@@ -111,9 +111,9 @@ const start = async () => {
       return reply.code(404).send({ error: 'not_found' });
     }
 
-    const body = (req.body ?? {}) as Omit<Review, 'reviewId'>;
+    const updatedReview = (req.body ?? {}) as Review
 
-    await updateReview(id, { reviewId: id, ...body });
+    await updateReview(id, { ...updatedReview, id });
 
     return reply.send({ ok: true });
   });

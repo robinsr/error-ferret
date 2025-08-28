@@ -1,11 +1,4 @@
 // Isomorphic, safe-to-bundle values only
-export const CODE_PLACEHOLDER = `// Paste your code here...
-// Example:
-function calculateSum(a, b) {
-    return a + b;
-}
-
-// The AI will review this code and provide feedback`;
 
 export const SUPPORTED_LANGUAGES = [
   {
