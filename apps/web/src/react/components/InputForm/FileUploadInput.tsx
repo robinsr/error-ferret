@@ -86,10 +86,6 @@ const FileUploadInput: React.FC<Props> = ({ selectedFiles, onFilesChange }) => {
           </div>
         )}
       </div>
-
-      <p className="mt-2 text-sm text-gray-500">
-        Upload your code collection. Our ferrets work in teams, covering every file and comparing notes.
-      </p>
     </div>
   );
 };

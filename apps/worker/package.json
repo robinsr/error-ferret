@@ -11,9 +11,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@emotion/hash": "0.9.2",
     "@errorferret/constants": "workspace:*",
     "@errorferret/env-node": "workspace:*",
     "@errorferret/reviewers": "workspace:*",
+    "@errorferret/schemas": "workspace:*",
     "@errorferret/types": "workspace:*",
     "@openai/openai": "jsr:5.16.0",
     "nanoid": "5.1.5",

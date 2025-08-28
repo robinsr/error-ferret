@@ -1,0 +1,84 @@
+// test_bad_server.ts
+import express from "express";
+import crypto from "crypto";
+import fs from "fs";
+import mysql from "mysql2/promise";
+
+const app = express();
+app.use(express.json());
+
+// Hardcoded secret + md5 for "auth" (weak/insecure)
+const API_KEY = "super-secret-key-123";
+function signToken(user: string) {
+  return crypto.createHash("md5").update(user + API_KEY).digest("hex");
+}
+
+// Create a connection per request (leaks / slow)
+const pool = mysql.createPool({ uri: process.env.DB_URL || "mysql://root@localhost/test" });
+
+app.post("/login", async (req, res) => {
+  // No input validation; logs sensitive data
+  console.log("login body:", req.body);
+  const { username, password } = req.body;
+
+  // SQL injection (string concat), no parameterization
+  const [rows] = await pool.query(`SELECT * FROM users WHERE name = '${username}' AND pass = '${password}'`);
+
+  if ((rows as any[]).length > 0) {
+    // Weak token, no expiration
+    const token = signToken(username);
+    return res.json({ ok: true, token });
+  }
+  return res.status(401).json({ ok: false });
+});
+
+app.get("/files", async (_req, res) => {
+  // Blocking I/O on hot path, no error handling
+  const files = fs.readdirSync("./uploads");
+  // N+1 stat calls (sync)
+  const meta = files.map((f) => fs.statSync("./uploads/" + f).size);
+  res.json({ files, meta });
+});
+
+app.post("/compute", async (req, res) => {
+  // CPU-bound loop on event loop thread
+  let sum = 0;
+  for (let i = 0; i < 1e8; i++) sum += i;
+
+  // Unhandled promise (fire-and-forget)
+  slowSideEffect(req.body?.payload);
+
+  // Trusts client to provide a function body (RCE risk)
+  // @ts-ignore
+  const result = eval(req.body.fn || "(()=>'ok')()");
+
+  res.json({ sum, result });
+});
+
+async function slowSideEffect(payload: any) {
+  // Swallows errors; no retries/backoff
+  await fetch("https://example.com/hook", {
+    method: "POST",
+    body: JSON.stringify({ payload }),
+    headers: { "content-type": "application/json" }
+  });
+}
+
+app.get("/user/:id", async (req, res) => {
+  // Race-prone cache (mutable global), no TTL
+  // @ts-ignore
+  global.cache = global.cache || {};
+  const id = req.params.id;
+
+  if (global.cache[id]) return res.json(global.cache[id]);
+
+  // Missing prepared statements; string concat again
+  const [rows] = await pool.query(`SELECT id, email FROM users WHERE id = ${id}`);
+  // Stores PII in a global cache without encryption
+  // @ts-ignore
+  global.cache[id] = rows?.[0] || null;
+  res.json(global.cache[id]);
+});
+
+// Magic port, no graceful shutdown, no health checks
+app.listen(3000, () => console.log("server on 3000"));

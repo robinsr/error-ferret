@@ -1,12 +1,21 @@
-import { connect, StringCodec } from 'nats';
+import type { ModelFindings, Review, ReviewStatus } from '@errorferret/schemas';
+import type { ReviewFeedbackItem } from '@errorferret/types';
+
 import { setTimeout as delay } from 'node:timers/promises';
-import type { Review,ReviewFeedbackItem, ReviewStatus } from '@errorferret/types';
+import { connect, StringCodec } from 'nats';
 
 import { FERRET_REVIEWERS } from '@errorferret/reviewers';
+import { generateInitialFindings } from './services/openai/feedback';
+
+import "@errorferret/env-node"
+
+console.log('env', process.env)
+
 
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 const API_BASE = process.env.API_BASE || 'http://localhost:3000';
 const sc = StringCodec();
+
 
 
 const fakeFeedbackItems: ReviewFeedbackItem[] = FERRET_REVIEWERS.map(reviewer => ({
@@ -31,16 +40,22 @@ const fakeFeedbackItems: ReviewFeedbackItem[] = FERRET_REVIEWERS.map(reviewer =>
   }
 }))
 
-async function fakeLLM(review: Review): Promise<ReviewFeedbackItem[]> {
+async function fakeLLM(review: Review): Promise<ModelFindings> {
   // MVP: generate deterministic, obviously-fake items
-  return fakeFeedbackItems
+  // return fakeFeedbackItems
+
+  const feedback = await generateInitialFindings(review)
+
+  console.log('feedback', feedback)
+
+  return feedback
 }
 
 async function onPendingReview(review: Review): Promise<Review> {
   console.log('processing', review.id);
 
   // simulate processing
-  await delay(2000);
+  // await delay(2000);
 
   const items = await fakeLLM(review);
 

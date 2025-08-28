@@ -24,8 +24,7 @@ export type ReviewArtifact = ReviewArtifactFile | ReviewArtifactRaw;
 export type ReviewArtifactFile = {
   type: 'file';
   filename: string;
-  objectId: string;
-  language: string;
+  code: string;
 }
 
 // User submits code via the text editor, we get the raw code as a string
@@ -120,24 +119,24 @@ export type GetReviewResponse = {
 /**
  * Defines the structure of the response from the LLM (as described in the system prompt)
  */
-// export type LLMResponseItem = {
-//   file: string;
-//   line: string;
-//   lineNumber: number;
-//   reviewer: ReviewerProfile;
-//   feedback: string;
-// }
+export type LLMResponseItem = {
+  file: string;
+  line: string;
+  lineNumber: number;
+  reviewer: ReviewerProfile;
+  feedback: string;
+}
 
 /**
  * Defines a single feedback item, parsed from the LLM response
  */
-// export type LLMFeedbackItem = {
-//   lineNum: number;
-//   columnNum: number;
-//   code: string;
-//   contextLines: LLMCodeReference[];
-//   feedback: string;
-// }
+export type LLMFeedbackItem = {
+  lineNum: number;
+  columnNum: number;
+  code: string;
+  contextLines: LLMCodeReference[];
+  feedback: string;
+}
 
 /**
  * Defines the structure of the response from the feedback service
@@ -152,10 +151,10 @@ export type GetReviewResponse = {
 /**
  * Defines a reference to a line of user code, used to display the context of the feedback
  */
-// export type LLMCodeReference = {
-//   lineNum: number;
-//   code: string;
-// }
+export type LLMCodeReference = {
+  lineNum: number;
+  code: string;
+}
 
 /*
 // Parse the user's code into identifiable lines

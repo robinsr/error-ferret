@@ -4,7 +4,7 @@ export const prerender = false
 import '@/styles/global.css';
 
 import type { Review, ReviewFeedbackItem  } from '@errorferret/types'
-import Layout from '@/layouts/Layout.astro'
+import Layout from '@layouts/Layout.astro'
 import Header from '@react-components/Header.tsx'
 import Section from '@react-components/Section.tsx'
 import FeedbackItem from '@react-components/ReviewFeedback/FeedbackItem.tsx'
@@ -18,7 +18,13 @@ const fetchReview = async (id: string): Promise<Review> => {
 }
 
 const requestId = Astro.params.id as string
-const review = await fetchReview(requestId)
+let review: Review | null = null
+
+try {
+  review = await fetchReview(requestId)
+} catch (e) {
+  return Astro.redirect('/404', 404)
+}
 ---
 <Layout>
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -35,7 +41,7 @@ const review = await fetchReview(requestId)
           </div>
         </Section>
 
-        <div class="hidden">
+        <div class="">
           <Section title="Review Details" description={`Showing details for review ${requestId}`}>
             <div class="px-4 py-8">
               <pre>{JSON.stringify(review, null, 4)}</pre>

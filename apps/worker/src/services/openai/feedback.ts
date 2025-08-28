@@ -1,85 +1,95 @@
-import type { FeedbackItem, LLMResponseItem, CodeReference, PromptConfig } from '@/types';
+
+import type { Review, ModelFindings } from "@errorferret/schemas"
+import { ModelFindingsSchema } from "@errorferret/schemas"
+
 import { LLM_MODELS, MAX_TOKENS, SNIPPET_LINES_BEFORE, SNIPPET_LINES_AFTER } from '@errorferret/constants';
+
 import { env } from '@errorferret/env-node';
 
 import OpenAI from '@openai/openai';
 
-import { generateSystemPrompt, generateUserPrompt } from '@/utils/prompts';
+import { generateSystemPrompt } from '@prompt/system';
+import { generateUserPrompt } from '@prompt/user';
+
 import { mockChoices } from '@/utils/mocks';
+import { cleanModelResponse } from '@/utils/model-response';
 
 
-const getContextLines = (code: string, line: string, lineNumber: number): CodeReference[] => {
-  const lines = code.split('\n');
+// const getContextLines = (code: string, line: string, lineNumber: number): CodeReference[] => {
+//   const lines = code.split('\n');
 
-  let foundLine = lineNumber;
+//   let foundLine = lineNumber;
 
-  if (line && line.length > 5) {
-    const occurrences = lines.filter(l => l === line).length;
+//   if (line && line.length > 5) {
+//     const occurrences = lines.filter(l => l === line).length;
 
-    // LLM's line counting is error-prone, so first check if the
-    // line is unique. If it is, we can return the line itself.
-    if (occurrences === 1) {
-      foundLine = lines.indexOf(line);
-    }
-  }
+//     // LLM's line counting is error-prone, so first check if the
+//     // line is unique. If it is, we can return the line itself.
+//     if (occurrences === 1) {
+//       foundLine = lines.indexOf(line);
+//     }
+//   }
 
-  const start = Math.max(0, foundLine - SNIPPET_LINES_BEFORE);
-  const end = Math.min(lines.length, foundLine + SNIPPET_LINES_AFTER);
+//   const start = Math.max(0, foundLine - SNIPPET_LINES_BEFORE);
+//   const end = Math.min(lines.length, foundLine + SNIPPET_LINES_AFTER);
 
-  return lines.slice(start, end).map((line, index) => ({
-    lineNum: start + index + 1,
-    code: line
-  }));
-}
+//   return lines.slice(start, end).map((line, index) => ({
+//     lineNum: start + index + 1,
+//     code: line
+//   }));
+// }
 
 
-const getLLMResponse = async (systemPrompt: string, userPrompt: string): Promise<string> => {
-  if (env.DEV) {
-    console.debug('Using mock choices');
-    return mockChoices[0]?.message?.content || '';
-  }
+async function getLLMResponse<T>(systemPrompt: string, userPrompt: string): Promise<T> {
+  // if (env.DEV) {
+  //   console.debug('Using mock choices');
+  //   return mockChoices[0]?.message?.content || '';
+  // }
+
+  console.debug('GETTING LLM RESPONSE', systemPrompt, userPrompt)
 
   const client = new OpenAI({
     apiKey: env.OPENAI_API_KEY
   });
 
-  const response = await client.chat.completions.create({
-    model: LLM_MODELS.GPT_5,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ],
-    max_completion_tokens: MAX_TOKENS,
-  });
+  try {
+    const response = await client.chat.completions.create({
+      model: LLM_MODELS.GPT_5,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      max_completion_tokens: MAX_TOKENS,
+    });
 
-  const review = response.choices[0]?.message?.content
+    const content = response.choices[0]?.message?.content
 
-  if (!review) {
-    console.error('No review generated', review)
-    throw Error('No review generated');
+    if (!content) {
+      console.error('No content generated for prompts:', { systemPrompt, userPrompt })
+      throw Error('No content generated for prompts');
+    }
+
+    return cleanModelResponse<T>(content);
+  } catch (error) {
+    console.error('Error getting LLM response:', error)
+    console.log("OPEN_AI_KEY:", env.OPENAI_API_KEY)
+    throw error
   }
-
-  return review;
 }
 
 
-export const generateFeedback = async (code: string, config: PromptConfig): Promise<FeedbackItem[]> => {
+export async function generateInitialFindings(review: Review): Promise<ModelFindings> {
 
-  const systemPrompt = generateSystemPrompt(config);
-  const userPrompt = generateUserPrompt(code);
+  const systemPrompt = generateSystemPrompt(review);
+  const userPrompt = generateUserPrompt(review);
 
-  const review = await getLLMResponse(systemPrompt, userPrompt);
+  const response = await getLLMResponse<ModelFindings>(systemPrompt, userPrompt)
+  const initialFindings = ModelFindingsSchema.safeParse(response)
 
-  const jsonReview = review.replace(/```json/g, '').replace(/```/g, '');
-  const parsedReview = JSON.parse(jsonReview);
+  if (!initialFindings.success) {
+    console.error('Invalid model response:', initialFindings.error)
+    throw Error('Invalid model response');
+  }
 
-  const feedbackItems: FeedbackItem[] = parsedReview.map((item: LLMResponseItem) => ({
-    code: item.line,
-    lineNum: item.lineNumber,
-    columnNum: 0,
-    contextLines: getContextLines(code, item.line, item.lineNumber),
-    feedback: item.feedback
-  }));
-
-  return feedbackItems;
+  return initialFindings.data;
 }

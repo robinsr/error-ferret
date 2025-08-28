@@ -5,7 +5,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@prompt/*": ["src/prompt/*"]
     }
   },
   "include": ["src"]

@@ -1,8 +1,10 @@
 import type { ReviewerProfile } from '@errorferret/reviewers';
-import type { ReviewStatus } from '@errorferret/types'
+import type { ReviewStatus, ReviewArtifact, CreateReviewResponse } from '@errorferret/types'
+import { FORM } from '@errorferret/branding'
 
 import React, { useEffect, useState } from 'react'
-import { createReviewFromPaste, getReview } from './lib/api'
+import { createReviewFromPaste, createReviewFromArtifacts, getReview } from '@lib/api'
+import { readFileToArtifact } from '@lib/artifacts'
 
 import ErrorMsg from '@react-components/ErrorMsg.tsx'
 import Features from '@react-components/Features.tsx'
@@ -20,12 +22,15 @@ import { FERRET_REVIEWERS } from '@errorferret/reviewers'
 
 type InputMode = 'paste' | 'upload'
 
+
+
 export default function App() {
   const [reviewId, setReviewId] = useState<string | null>(null)
   const [status, setStatus] = useState<ReviewStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [inputMode, setInputMode] = useState<InputMode>('paste')
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [artifacts, setArtifacts] = useState<ReviewArtifact[]>([])
 
   const [reviewers, setReviewers] = useState<ReviewerProfile[]>(
     FERRET_REVIEWERS.filter(r => r.focus === 'general')
@@ -39,9 +44,16 @@ export default function App() {
     setError(null)
     setStatus('creating')
 
+    let submitResult: CreateReviewResponse | null = null
+
     try {
-      const { reviewId } = await createReviewFromPaste(reviewers, code)
-      setReviewId(reviewId)
+      if (inputMode === 'paste') {
+        submitResult = await createReviewFromPaste(reviewers, code)
+      } else if (inputMode === 'upload') {
+        submitResult = await createReviewFromArtifacts(reviewers, artifacts)
+      }
+
+      setReviewId(submitResult?.reviewId || null)
       setStatus('queued')
     } catch (e: any) {
       setError(e.message)
@@ -94,15 +106,22 @@ export default function App() {
     onSubmit()
   }
 
+  async function syncArtifacts() {
+    const artifacts = await Promise.all(selectedFiles.map(readFileToArtifact))
+    setArtifacts(artifacts)
+
+    console.log('Artifacts:', artifacts)
+  }
+
+  useEffect(() => {
+    syncArtifacts()
+  }, [selectedFiles])
+
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-
       <Header />
-
         <Section title="Submit Code for Review" description="Paste your code below and get instant feedback" colorScheme="blue">
-
           <form id="reviewForm" className="p-8 space-y-6" onSubmit={handleSubmit}>
-
             <div className="flex justify-center">
               <div className="bg-gray-100 p-1 rounded-lg flex">
                 <button
@@ -131,11 +150,29 @@ export default function App() {
             </div>
 
             {inputMode == 'paste' && (
-              <TextareaInput name="code" label="Code to Review" onChange={setCode} />
+              <div className="flex flex-col">
+                <TextareaInput
+                  name="code"
+                  label={FORM.CODE.PASTE.LABEL}
+                  placeholder={FORM.CODE.PASTE.PLACEHOLDER}
+                  onChange={setCode}
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  {FORM.CODE.PASTE.HELP}
+                </p>
+              </div>
             )}
 
             {inputMode == 'upload' && (
-              <FileUploadInput selectedFiles={selectedFiles} onFilesChange={setSelectedFiles} />
+              <div className="flex flex-col">
+                <FileUploadInput
+                  selectedFiles={selectedFiles}
+                  onFilesChange={setSelectedFiles}
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  {FORM.CODE.UPLOAD.HELP}
+                </p>
+              </div>
             )}
 
             <ReviewerSelector selectedReviewers={reviewers} onSelectionChange={setReviewers} />

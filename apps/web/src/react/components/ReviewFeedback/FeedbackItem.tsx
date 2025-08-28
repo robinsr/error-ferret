@@ -3,7 +3,7 @@ import type { ReviewFeedbackItem } from '@errorferret/types';
 import React from 'react';
 import { Info } from 'lucide-react'
 
-import FeedbackLine from '@/react/components/ReviewFeedback/FeedbackLine';
+import FeedbackLine from '@react-components/ReviewFeedback/FeedbackLine';
 
 
 interface Props {

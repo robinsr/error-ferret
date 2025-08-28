@@ -1,0 +1,32 @@
+FILES: {{COUNT}}
+---
+FILE 1
+{
+  "file": "src/cache.ts",
+  "lines": [
+    {"id":"L-2c7f","n":41,"text":"const cache = new Map<string, User>();"},
+    {"id":"L-88b1","n":42,"text":"export async function getUser(id: string) {"},
+    {"id":"L-a9f0","n":43,"text":"  return cache.get(id)!;"},
+    {"id":"L-44d2","n":44,"text":"}"},
+    ...
+  ]
+}
+---
+FILE 2
+{ ... }
+---
+CONSTRAINTS
+- Maximum {{MAX_FINDINGS}} findings per file.
+
+FOCUS_AREAS: ["general","security","correctness","performance","readability","testing","style"]
+
+RUBRIC:
+- security: vulnerabilities, injection, unsafe deserialization, secrets, auth/z, TOCTOU.
+- correctness: logic/edge-case bugs, exception flow, race conditions, data integrity.
+- performance: algorithmic complexity, hot paths, allocations, I/O/chatty calls.
+- readability: naming, structure, duplication, dead code, comments that mislead.
+- testing: missing/weak tests, flakiness, poor isolation, fixtures, coverage gaps.
+- style: formatting/linters/conventions (non-semantic).
+- general: cross-cutting advice that doesn’t fit above or requires broad refactor.
+
+Return only the JSON array of FerretFinding.
