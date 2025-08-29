@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ReviewerProfile } from '@errorferret/reviewers';
-import { SELECT_FERRETS } from '@errorferret/branding';
+import { FORM } from '@errorferret/branding';
 import { FERRET_REVIEWERS } from '@errorferret/reviewers'
 import ReviewerOption from './ReviewerOption';
 
@@ -30,7 +30,7 @@ const ReviewerSelector: React.FC<Props> = ({
 
   return (
     <div className="w-full">
-      <label htmlFor="reviewers" className="block text-sm font-medium text-gray-700 mb-3">
+      <label htmlFor="reviewers" className="block text-sm font-medium text-gray-300 mb-3">
         Select Reviewers
       </label>
 
@@ -56,8 +56,8 @@ const ReviewerSelector: React.FC<Props> = ({
         value={selectedReviewers.join(',')}
       />
 
-      <p className="mt-2 text-sm text-gray-500">
-        {SELECT_FERRETS}
+      <p className="mt-2 text-sm text-gray-400">
+        {FORM.REVIEWERS.HELP}
       </p>
     </div>
   );

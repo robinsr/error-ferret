@@ -1,15 +1,13 @@
-import type { ModelFindings, Review, ReviewStatus } from '@errorferret/schemas';
-import type { ReviewFeedbackItem } from '@errorferret/types';
+import type { Review, ReviewFeedback } from '@errorferret/schemas';
+import { ReviewSchema } from '@errorferret/schemas'
 
-import { setTimeout as delay } from 'node:timers/promises';
-import { connect, StringCodec } from 'nats';
-
-import { FERRET_REVIEWERS } from '@errorferret/reviewers';
-import { generateInitialFindings } from './services/openai/feedback';
 
 import "@errorferret/env-node"
 
-console.log('env', process.env)
+import { generateInitialFindings, generateStyledFeedback } from './services/openai/feedback';
+import { toFeedbackItems } from './utils/mapping';
+import { timeExecution } from './utils/metrics';
+import { connect, StringCodec } from 'nats';
 
 
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
@@ -17,53 +15,53 @@ const API_BASE = process.env.API_BASE || 'http://localhost:3000';
 const sc = StringCodec();
 
 
-
-const fakeFeedbackItems: ReviewFeedbackItem[] = FERRET_REVIEWERS.map(reviewer => ({
-  comment: "Do logging throughout the code, remove debug logging",
-  severity: "high",
-  reviewer: reviewer,
-  location: {
-    filename: "app/controllers/users_controller.rb",
-    lineNumber: 10
-  },
-  context: {
-    filename: "app/controllers/users_controller.rb",
-    lines: [
-      { lineNumber: 6, code: "class ApplicationController < ActionController::Base" },
-      { lineNumber: 7, code: "class ApplicationController < ActionController::Base" },
-      { lineNumber: 8, code: "class UsersController < ApplicationController" },
-      { lineNumber: 9, code: "def index" },
-      { lineNumber: 10, code: "def index" },
-      { lineNumber: 11, code: "def show" },
-      { lineNumber: 12, code: "def create" }
-    ]
-  }
-}))
-
-async function fakeLLM(review: Review): Promise<ModelFindings> {
-  // MVP: generate deterministic, obviously-fake items
-  // return fakeFeedbackItems
-
-  const feedback = await generateInitialFindings(review)
-
-  console.log('feedback', feedback)
-
-  return feedback
-}
-
 async function onPendingReview(review: Review): Promise<Review> {
-  console.log('processing', review.id);
+  console.log('Processing review', JSON.stringify(review, null, 2));
 
-  // simulate processing
-  // await delay(2000);
+  console.log("Generating initial findings...")
+  const [ feedback, initialMs ] = await timeExecution(generateInitialFindings, review)
+  console.log(`generateInitialFindings.durationMs=${initialMs}ms`)
 
-  const items = await fakeLLM(review);
+  console.log("Generating styled feedback...")
+  const [ styledFeedback, styledMs ] = await timeExecution(generateStyledFeedback, review, feedback)
+  console.log(`generateStyledFeedback.durationMs=${styledMs}`)
 
-  review.feedback = items;
+  const feedbackItems = toFeedbackItems(review, styledFeedback)
+
+  review.feedback = feedbackItems as ReviewFeedback[];
   review.status = 'complete';
 
   return review;
 }
+
+async function updateReview(review: Review): Promise<Review> {
+  console.log(`Updating review ${review.id}, status=${review.status}`);
+
+  const apiUrl = `${API_BASE}/internal/reviews/${review.id}`;
+
+  const res = await fetch(apiUrl, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(review)
+  });
+
+  if (!res.ok) {
+    throw new Error(`callback failed: ${apiUrl} ${res.status}`);
+  }
+
+  return review;
+}
+
+function decodeReview(data: string): Review {
+  const parsed = ReviewSchema.safeParse(JSON.parse(data));
+
+  if (!parsed.success) {
+    throw new Error(`invalid review: ${parsed.error.message}`);
+  }
+
+  return parsed.data
+}
+
 
 async function run() {
   const nc = await connect({ servers: NATS_URL });
@@ -71,21 +69,21 @@ async function run() {
   console.log('worker subscribed to reviews.pending');
 
   for await (const m of sub) {
+    const review = decodeReview(sc.decode(m.data))
+
     try {
-      const review = JSON.parse(sc.decode(m.data)) as Review
-      const result = await onPendingReview(review);
+      await updateReview({ ...review, status: "processing" });
 
-      const res = await fetch(`${API_BASE}/internal/reviews/${review.id}/complete`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(result)
-      });
+      const [ result, processingMs ] = await timeExecution(onPendingReview, review);
 
-      if (!res.ok) {
-        throw new Error(`callback failed: ${res.status}`);
-      }
+      console.log(`onPendingReview.durationMs=${processingMs}ms`)
+
+      await updateReview({ ...result, status: "complete" });
+
       console.log('completed', review.id);
     } catch (e) {
+      await updateReview({ ...review, status: "failed" });
+
       console.error('worker error', e);
     }
   }

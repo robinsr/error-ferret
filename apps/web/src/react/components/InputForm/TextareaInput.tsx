@@ -32,16 +32,16 @@ const TextareaInput: React.FC<Props> = ({
   };
 
   const cls = [
-    "block w-full px-4 py-4 border border-gray-300 rounded-lg shadow-sm",
+    "block w-full px-4 py-4 border border-gray-600 rounded-lg shadow-sm",
     "focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
     "resize-none font-mono text-sm",
-    "bg-gray-50 text-gray-900 placeholder-gray-500",
+    "bg-gray-800 text-white placeholder-gray-400",
     "transition-colors duration-200"
   ].join(' ');
 
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-3">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-3">
         {label}
       </label>
 

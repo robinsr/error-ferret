@@ -26,28 +26,22 @@ try {
   return Astro.redirect('/404', 404)
 }
 ---
-<Layout>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto flex flex-col gap-8">
-        <Header />
-
-        <Section title="Review Feedback" description={`Showing feedback for review ${requestId}`}>
-          <div class="px-4 py-8">
-            <div class="grid grid-cols-1 gap-4">
-              {review.feedback.map((item, index) => (
-                <FeedbackItem feedbackItem={item} />
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        <div class="">
-          <Section title="Review Details" description={`Showing details for review ${requestId}`}>
-            <div class="px-4 py-8">
-              <pre>{JSON.stringify(review, null, 4)}</pre>
-            </div>
-          </Section>
-        </div>
+<Layout title={`Review ${requestId}`}>
+  <Section title="Review Feedback" description={`Showing feedback for review ${requestId}`}>
+    <div class="px-4 py-8">
+      <div class="grid grid-cols-1 gap-4">
+        {review.feedback.map((item, index) => (
+          <FeedbackItem feedbackItem={item} />
+        ))}
       </div>
     </div>
+  </Section>
+
+  <div class="hidden">
+    <Section title="Review Details" description={`Showing details for review ${requestId}`}>
+      <div class="px-4 py-8">
+        <pre>{JSON.stringify(review, null, 4)}</pre>
+      </div>
+    </Section>
+  </div>
 </Layout>

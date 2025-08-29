@@ -71,7 +71,7 @@ const start = async () => {
   });
 
   // allow worker to write back results (MVP, trust local)
-  server.post('/internal/reviews/:id/complete', async (req, reply) => {
+  server.put('/internal/reviews/:id', async (req, reply) => {
     try {
       const id = (req.params as any).id as string;
 
@@ -85,7 +85,7 @@ const start = async () => {
         return badRequest(reply, parsed.error.message);
       }
 
-      await updateReview(id, { ...parsed.data, id });
+      updateReview(id, { ...parsed.data, id });
 
       return okEmpty(reply);
     } catch (err) {

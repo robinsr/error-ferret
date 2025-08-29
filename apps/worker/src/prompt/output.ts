@@ -14,7 +14,7 @@ SCHEMA
 FerretFinding = {
   "file": string,                // must match an input file
   "lineIds": string[],           // 1..k ids from the provided lines of that file
-  "severity": "info"|"warn"|"error",
+  "severity": "low"|"medium"|"high", // severity of the finding
   "focus": Focus,                // EXACTLY one from FOCUS_AREAS
   "message": string,             // concise guidance
   "codeQuote": string            // short exact excerpt; must be substring of the concatenated selected lines

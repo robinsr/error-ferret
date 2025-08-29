@@ -31,8 +31,8 @@ const ErrorMsg: React.FC<Props> = ({ error, onTryAgain, onClearForm }) => {
       <div className="flex items-start gap-4">
         {/* Error Icon */}
         <div className="flex-shrink-0 mt-1">
-          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-red-900 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
             </svg>
           </div>
@@ -40,9 +40,9 @@ const ErrorMsg: React.FC<Props> = ({ error, onTryAgain, onClearForm }) => {
 
         {/* Error Content */}
         <div className="flex-1 min-w-0">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800 font-medium mb-2">Something went wrong</p>
-            <p className="text-red-700 text-sm leading-relaxed">{error}</p>
+          <div className="bg-red-900 border border-red-700 rounded-lg p-4">
+            <p className="text-red-200 font-medium mb-2">Something went wrong</p>
+            <p className="text-red-300 text-sm leading-relaxed">{error}</p>
           </div>
 
           {/* Action Buttons */}
@@ -59,7 +59,7 @@ const ErrorMsg: React.FC<Props> = ({ error, onTryAgain, onClearForm }) => {
 
             <button
               onClick={handleClearForm}
-              className="inline-flex items-center justify-center px-4 py-2 bg-white text-red-600 text-sm font-medium rounded-lg border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-700 text-red-400 text-sm font-medium rounded-lg border border-red-600 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>

@@ -5,57 +5,52 @@ import Layout from '@layouts/Layout.astro';
 import Section from '@react-components/Section.tsx'
 import Header from '@react-components/Header.tsx'
 import { FERRET_REVIEWERS } from '@errorferret/reviewers';
+
+
+const title = "Meet the Team"
+const description = "Meet our trained ferret reviewers — each with a distinct focus, all dedicated to improving your code."
+const headerLinkPath = "./"
+const headerLinkText = "← Back"
+
+
 ---
 
-<Layout title="Meet the Team">
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto flex flex-col gap-8">
-      <Header />
+<Layout title={title}>
+  <Section title={title} description={description} linkUrl={headerLinkPath} linkText={headerLinkText}>
+    <!-- Reviewers Grid -->
+    <div class="space-y-12 py-12 px-20">
+      {FERRET_REVIEWERS.map((reviewer, index) => {
+        const isEven = index % 2 === 0;
+        return (
+          <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
 
-
-      <Section
-        title="Meet the Team"
-        description="Meet our trained ferret reviewers — each with a distinct focus, all dedicated to improving your code."
-        linkUrl="./"
-        linkText="← Back"
-      >
-
-        <!-- Reviewers Grid -->
-        <div class="space-y-12 py-12 px-20">
-          {FERRET_REVIEWERS.map((reviewer, index) => {
-            const isEven = index % 2 === 0;
-            return (
-              <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-
-                <div class="flex-shrink-0">
-                  <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
-                    <img
-                      src={reviewer.imageUrl}
-                      alt={`${reviewer.name} avatar`}
-                      class="w-full h-full object-cover"
-                      onerror="this.src='./images/ferret_avatar.jpg'"
-                    />
-                  </div>
-                </div>
-
-                <div class="flex-1 text-center lg:text-left">
-                  <h2 class="text-3xl font-bold text-gray-900 mb-2">
-                    {reviewer.name} the {reviewer.title}
-                  </h2>
-                  <p class="text-lg text-gray-600 mb-4 italic">
-                    "{reviewer.personality}"
-                  </p>
-                  <div class="prose prose-lg text-gray-700 max-w-none">
-                    <p class="text-base leading-relaxed">
-                      {reviewer.backstory}
-                    </p>
-                  </div>
-                </div>
+            <div class="flex-shrink-0">
+              <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
+                <img
+                  src={reviewer.imageUrl}
+                  alt={`${reviewer.name} avatar`}
+                  class="w-full h-full object-cover"
+                  onerror="this.src='./images/ferret_avatar.jpg'"
+                />
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </Section>
-  </div>
+            </div>
+
+            <div class="flex-1 text-center lg:text-left">
+              <h2 class="text-3xl font-bold text-white mb-2">
+                {reviewer.name} the {reviewer.title}
+              </h2>
+              <p class="text-lg text-gray-300 mb-4 italic">
+                "{reviewer.personality}"
+              </p>
+              <div class="prose prose-lg text-gray-200 max-w-none">
+                <p class="text-base leading-relaxed">
+                  {reviewer.backstory}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </Section>
 </Layout>

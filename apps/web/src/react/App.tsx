@@ -22,6 +22,8 @@ import { FERRET_REVIEWERS } from '@errorferret/reviewers'
 
 type InputMode = 'paste' | 'upload'
 
+const POLLING_INTERVAL = 2000 // 2 seconds
+
 
 
 export default function App() {
@@ -73,6 +75,8 @@ export default function App() {
         setStatus(review.status)
 
         if (review.status === 'complete') {
+          setError(null)
+
           window.location.href = `/review/${reviewId}`
         }
 
@@ -84,12 +88,8 @@ export default function App() {
           setError('Review not found')
         }
 
-        if (review.status === 'creating') {
-          setError('Review is being created')
-        }
-
         if (review.status !== 'complete' && review.status !== 'failed') {
-          timer = window.setTimeout(tick, 600) // simple poll
+          timer = window.setTimeout(tick, POLLING_INTERVAL) // simple poll
         }
       } catch (e: any) {
         setError(e.message)
@@ -118,78 +118,77 @@ export default function App() {
   }, [selectedFiles])
 
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-      <Header />
-        <Section title="Submit Code for Review" description="Paste your code below and get instant feedback" colorScheme="blue">
-          <form id="reviewForm" className="p-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="flex justify-center">
-              <div className="bg-gray-100 p-1 rounded-lg flex">
-                <button
-                  type="button"
-                  onClick={() => setInputMode('paste')}
-                  className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
-                    inputMode === 'paste'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                  Paste your code
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInputMode('upload')}
-                  className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
-                    inputMode === 'upload'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                  Upload files
-                </button>
-              </div>
+    <main>
+      <Section title="Submit Code for Review" description="Paste your code below and get instant feedback" colorScheme="blue">
+        <form id="reviewForm" className="p-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="flex justify-center">
+            <div className="bg-gray-700 p-1 rounded-lg flex">
+              <button
+                type="button"
+                onClick={() => setInputMode('paste')}
+                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                  inputMode === 'paste'
+                    ? 'bg-gray-800 text-blue-400 shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                Paste your code
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode('upload')}
+                className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+                  inputMode === 'upload'
+                    ? 'bg-gray-800 text-blue-400 shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                Upload files
+              </button>
             </div>
+          </div>
 
-            {inputMode == 'paste' && (
-              <div className="flex flex-col">
-                <TextareaInput
-                  name="code"
-                  label={FORM.CODE.PASTE.LABEL}
-                  placeholder={FORM.CODE.PASTE.PLACEHOLDER}
-                  onChange={setCode}
-                />
-                <p className="mt-2 text-sm text-gray-500">
-                  {FORM.CODE.PASTE.HELP}
-                </p>
-              </div>
-            )}
-
-            {inputMode == 'upload' && (
-              <div className="flex flex-col">
-                <FileUploadInput
-                  selectedFiles={selectedFiles}
-                  onFilesChange={setSelectedFiles}
-                />
-                <p className="mt-2 text-sm text-gray-500">
-                  {FORM.CODE.UPLOAD.HELP}
-                </p>
-              </div>
-            )}
-
-            <ReviewerSelector selectedReviewers={reviewers} onSelectionChange={setReviewers} />
-
-            <div className="flex items-center justify-center pt-4">
-              <SubmitButton />
+          {inputMode == 'paste' && (
+            <div className="flex flex-col">
+              <TextareaInput
+                name="code"
+                label={FORM.CODE.PASTE.LABEL}
+                placeholder={FORM.CODE.PASTE.PLACEHOLDER}
+                onChange={setCode}
+              />
+              <p className="mt-2 text-sm text-gray-400">
+                {FORM.CODE.PASTE.HELP}
+              </p>
             </div>
-          </form>
+          )}
+
+          {inputMode == 'upload' && (
+            <div className="flex flex-col">
+              <FileUploadInput
+                selectedFiles={selectedFiles}
+                onFilesChange={setSelectedFiles}
+              />
+              <p className="mt-2 text-sm text-gray-400">
+                {FORM.CODE.UPLOAD.HELP}
+              </p>
+            </div>
+          )}
+
+          <ReviewerSelector selectedReviewers={reviewers} onSelectionChange={setReviewers} />
+
+          <div className="flex items-center justify-center pt-4">
+            <SubmitButton />
+          </div>
+        </form>
+    </Section>
+
+    <Features />
+
+    {error && (
+      <Section title="Error" description="An error occurred while generating feedback" colorScheme="red">
+        <ErrorMsg error={error} />
       </Section>
-
-      <Features />
-
-      {error && (
-        <Section title="Error" description="An error occurred while generating feedback" colorScheme="red">
-          <ErrorMsg error={error} />
-        </Section>
-      )}
+    )}
 
     {isSubmitting && (
       <Loading status={status}  />

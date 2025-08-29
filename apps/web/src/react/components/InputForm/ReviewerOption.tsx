@@ -16,12 +16,12 @@ const ReviewerOption: React.FC<Props> = ({ reviewer, isSelected, onToggle }) => 
       onClick={onToggle}
       className={`group relative flex flex-col w-full items-center p-3 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
         isSelected
-          ? 'border-blue-500 bg-blue-50 shadow-md'
-          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+          ? 'border-blue-500 bg-blue-900 shadow-md'
+          : 'border-gray-600 bg-gray-800 hover:border-gray-500 hover:shadow-sm'
       }`}
     >
       {/* Avatar */}
-      <div className="w-16 h-16 rounded-full overflow-hidden mb-2 border-2 border-gray-200">
+      <div className="w-16 h-16 rounded-full overflow-hidden mb-2 border-2 border-gray-600">
         <img
           src={reviewer.imageUrl}
           alt={`${reviewer.name} avatar`}
@@ -31,14 +31,14 @@ const ReviewerOption: React.FC<Props> = ({ reviewer, isSelected, onToggle }) => 
 
       {/* Name */}
       <span className={`font-semibold text-sm ${
-        isSelected ? 'text-blue-700' : 'text-gray-900'
+        isSelected ? 'text-blue-300' : 'text-white'
       }`}>
         {reviewer.name}
       </span>
 
       {/* Title */}
       <span className={`text-xs text-center ${
-        isSelected ? 'text-blue-600' : 'text-gray-600'
+        isSelected ? 'text-blue-400' : 'text-gray-300'
       }`}>
         {reviewer.title}
       </span>

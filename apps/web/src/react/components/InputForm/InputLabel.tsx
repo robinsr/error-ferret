@@ -7,7 +7,7 @@ interface Props {
 
 const InputLabel: React.FC<Props> = ({ name, label }) => {
   return (
-    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-3">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-3">
       {label}
     </label>
   );

@@ -1,8 +1,4 @@
-import type { FeedbackItem } from '@/types';
-
-export const mockFeedbackItems: FeedbackItem[] = [
-
-]
+import type { ModelFindings } from '@errorferret/schemas';
 
 export const mockChoices = [
   {
@@ -55,5 +51,80 @@ export const mockChoices = [
       annotations: []
     },
     finish_reason: 'stop'
+  }
+]
+
+export const mockGtp5Response: ModelFindings = [
+  {
+    file: 'text',
+    lineIds: [ 'L-1b6esw7', 'L-d2ku5c' ],
+    severity: 'high',
+    focus: 'performance',
+    message: 'Synchronous filesystem calls inside a request handler block the event loop; switch to async fs APIs and batch work (e.g., Promise.all) to avoid per-request blocking.',
+    codeQuote: 'readdirSync'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-fu0j8v' ],
+    severity: 'high',
+    focus: 'performance',
+    message: 'The 1e8 iteration loop is CPU-bound and will block the event loop under load; offload this work to a Worker Thread or a background job.',
+    codeQuote: 'for (let i = 0; i < 1e8; i++) sum += i;'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-utw3o3' ],
+    severity: 'high',
+    focus: 'clarity',
+    message: 'Evaluating request-provided code makes behavior opaque and unpredictable; replace eval with explicit, well-defined operations.',
+    codeQuote: 'eval(req.body.fn'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-48vexp', 'L-hgrl59', 'L-ro70ut' ],
+    severity: 'medium',
+    focus: 'clarity',
+    message: 'Using @ts-ignore suppresses type checking and hides real issues, reducing maintainability; prefer proper typing or targeted casts.',
+    codeQuote: '@ts-ignore'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-7o0l6q', 'L-1t41gas', 'L-yp76u' ],
+    severity: 'high',
+    focus: 'performance',
+    message: 'Process-global cache without bounds or TTL can grow unbounded, causing memory bloat and GC pressure; use a bounded cache (e.g., LRU) with eviction and TTL.',
+    codeQuote: 'global.cache'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-1jvnvef' ],
+    severity: 'medium',
+    focus: 'performance',
+    message: 'Selecting all columns and constructing ad-hoc SQL prevents statement reuse and fetches unnecessary data; select only needed columns and use parameterized queries for better plan caching.',
+    codeQuote: 'SELECT * FROM users'
+  },
+  {
+    file: 'text',
+    lineIds: [ 'L-yziev1' ],
+    severity: 'medium',
+    focus: 'performance',
+    message: 'The files endpoint returns the entire directory listing and metadata; for large directories this causes latency and memory spikes—add pagination/limits and consider lazy-loading metadata.',
+    codeQuote: '/files'
+  },
+  {
+    file: 'text',
+    lineIds: [
+      'L-1id413q',
+      'L-1j09141',
+      'L-1ubmyvp',
+      'L-4pbyxy',
+      'L-69tnpe',
+      'L-xs0suj',
+      'L-kyshef'
+    ],
+    severity: 'medium',
+    focus: 'clarity',
+    message: 'Fire-and-forget slowSideEffect obscures control flow and error handling; either await it (with timeout/retries) or explicitly decouple via a job queue and handle failures.',
+    codeQuote: 'slowSideEffect(req.body?.payload)'
   }
 ]

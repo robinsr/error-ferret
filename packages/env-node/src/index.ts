@@ -9,8 +9,6 @@ const schema = z.object({
 
 const parsed = schema.parse(process.env);
 
-console.log('env', process.env)
-
 export const env = {
   ...parsed,
   // mimic import.meta.env.DEV

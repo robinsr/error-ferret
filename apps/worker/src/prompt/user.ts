@@ -1,23 +1,23 @@
 import type { Review, ReviewFileArtifact, ReviewRawArtifact } from '@errorferret/schemas';
 import type { CodeFile } from '@errorferret/types';
 import { MAX_FEEDBACK_ITEMS } from '@errorferret/constants';
-import { parseCodeFile } from '../utils/codefile';
+import { parseArtifact } from '../utils/codefile';
 
 import { getFocusValueKeys } from './rubric';
 
 
 
 function prepareFileArtifact(artifact: ReviewFileArtifact): CodeFile {
-  const lines = parseCodeFile(artifact.code);
+  const lines = parseArtifact(artifact);
   const filename = artifact.filename;
 
   return { filename, lines };
 }
 
 function prepareRawArtifact(artifact: ReviewRawArtifact): CodeFile {
-  const lines = parseCodeFile(artifact.code);
+  const lines = parseArtifact(artifact);
 
-  return { filename: "", lines };
+  return { filename: "text", lines };
 }
 
 function printCodeObject(codeObject: CodeFile, index: number): string {

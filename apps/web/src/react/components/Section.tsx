@@ -32,9 +32,9 @@ const Section: React.FC<Props> = ({
   const hasLink = linkUrl && linkText
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+    <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 overflow-hidden">
       {/* Section header */}
-      <div className={`px-8 py-6 border-b border-gray-200 bg-gradient-to-r ${headerColorCls}`}>
+      <div className={`px-8 py-6 border-b border-gray-700 bg-gradient-to-r ${headerColorCls}`}>
         <h2 className="text-2xl font-semibold text-white">{title}</h2>
 
         {description && (

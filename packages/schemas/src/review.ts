@@ -62,10 +62,43 @@ export type ReviewArtifact = z.infer<typeof ReviewArtifactSchema>;
 // Review Feedback
 //
 
+export const ReviewFeedbackSourceSchema = z.object({
+  name: z.string(),
+  title: z.string(),
+  focus: ReviewerFocusSchema,
+  imageUrl: z.string(),
+});
+
+export type ReviewFeedbackSource = z.infer<typeof ReviewFeedbackSourceSchema>;
+
+export const CodeLocationSchema = z.object({
+  lineNumber: z.number(),
+  columnNumber: z.number().optional(),
+  filename: z.string().optional(),
+});
+
+export type CodeLocation = z.infer<typeof CodeLocationSchema>;
+
+export const ReviewFeedbackContextLineSchema = z.object({
+  lineNumber: z.number(),
+  code: z.string(),
+});
+
+export type ReviewFeedbackContextLine = z.infer<typeof ReviewFeedbackContextLineSchema>;
+
+export const ReviewFeedbackContextSchema = z.object({
+  filename: z.string(),
+  lines: z.array(ReviewFeedbackContextLineSchema),
+});
+
+export type ReviewFeedbackContext = z.infer<typeof ReviewFeedbackContextSchema>;
+
 export const ReviewFeedbackSchema = z.object({
+  reviewer: ReviewFeedbackSourceSchema,
   comment: z.string(),
   severity: z.enum(['low', 'medium', 'high']),
-  reviewer: ReviewerFocusSchema,
+  location: CodeLocationSchema,
+  context: ReviewFeedbackContextSchema,
 });
 
 export type ReviewFeedback = z.infer<typeof ReviewFeedbackSchema>;
@@ -89,26 +122,8 @@ export const ReviewSchema = z.object({
   id: z.string(),
   status: ReviewStatusSchema,
   submission: ReviewSubmissionSchema,
-  /**
-   * For now, we're using the model findings schema
-   * to store the feedback.
-   *
-   * This feedback is not mapped to the personality which will require an additional mapping step.
-   *
-   * The feedback items reference stable line ids, which will need to be mapped to code locations.
-   *
-   * TODO: remove this once the mapping steps are in place
-   */
-  feedback: ModelFindingsSchema
-}).strict();
-
-export const ReviewSchemaV2 = z.object({
-  id: z.string(),
-  status: ReviewStatusSchema,
-  submission: ReviewSubmissionSchema,
   feedback: z.array(ReviewFeedbackSchema),
 }).strict();
-
 
 export type Review = z.infer<typeof ReviewSchema>;
 

@@ -16,6 +16,10 @@ export function getReviewerProfiles(review: Review): ReviewerProfile[] {
     .filter(r => r !== undefined) as ReviewerProfile[];
 }
 
+export function getReviewerByFocus(review: Review, focus: ReviewerFocus): ReviewerProfile {
+  return getReviewerProfiles(review).find(r => r.focus === focus) as ReviewerProfile;
+}
+
 /**
  * Returns a list of focus values requested by the user
  *

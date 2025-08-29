@@ -1,5 +1,6 @@
 ---
 import { PAGE_TITLES } from '@errorferret/branding';
+import Header from '@react-components/Header.tsx';
 
 interface Props {
   title?: string
@@ -7,19 +8,26 @@ interface Props {
 
 const title = `Error Ferret - ${Astro.props.title ?? PAGE_TITLES[0]}`;
 
+const base_page_width = 'max-w-6xl';
+
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
 	<body>
-		<slot />
+    <Header />
+    <div class="min-h-screen bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div class:list={[base_page_width, "mx-auto flex flex-col gap-8"]}>
+        <slot />
+      </div>
+    </div>
 	</body>
 </html>
 
@@ -29,5 +37,8 @@ const title = `Error Ferret - ${Astro.props.title ?? PAGE_TITLES[0]}`;
 		margin: 0;
 		width: 100%;
 		height: 100%;
+    background-color: #18181b;
+
+    /* font-size: 10px; */
 	}
 </style>
