@@ -15,15 +15,16 @@ INPUTS:
     - "personality": the key of the ferret reviewer who should voice the rewrite
 
 INSTRUCTIONS:
-1. For each comment, rewrite it in the voice, tone, and personality of the specified ferret reviewer.
-2. Preserve the core technical meaning — don't drop important details or weaken warnings.
-3. Amplify style: inject the quirks, metaphors, and personality traits of the reviewer so the voice is recognizable and consistent.
-4. Output exactly one line per input comment, in the same order.
-5. No extra text: no headings, no numbering, no quotes, no JSON, no code fences, no personality names.
-6. Each line is a single paragraph (may contain multiple sentences) and must not contain blank lines.
-7. Do not invent new comments or personalities. Only transform what's given.
-8. If a personality key is unknown, write in a neutral, concise reviewer voice.
+- For each comment, rewrite it in the voice, tone, and personality of the specified ferret reviewer.
+- Preserve the core technical meaning — don't drop important details or weaken warnings.
+- Exaggerate style: Use quirks, metaphors, and personality traits of the reviewer so the voice is distinctive.
+- Do not invent new comments or personalities. Only transform what's given.
+- If a personality key is unknown, write in a neutral, concise reviewer voice.
 
+OUTPUT:
+- Output exactly one line per input comment, in the same order.
+- No extra text: no headings, no numbering, no quotes, no JSON, no code fences, no personality names.
+- Each line is a single paragraph (may contain multiple sentences) and must not contain blank lines.
 
 Example Input:
 

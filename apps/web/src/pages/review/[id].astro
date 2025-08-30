@@ -4,10 +4,13 @@ export const prerender = false
 import '@/styles/global.css';
 
 import type { Review, ReviewFeedbackItem  } from '@errorferret/types'
+
 import Layout from '@layouts/Layout.astro'
-import Header from '@react-components/Header.tsx'
-import Section from '@react-components/Section.tsx'
-import FeedbackItem from '@react-components/ReviewFeedback/FeedbackItem.tsx'
+
+import Header from '@react-components/ui/Header'
+import Section from '@react-components/ui/Section'
+
+import FeedbackItem from '@react-components/sections/ReviewFeedback/FeedbackItem.tsx'
 
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'

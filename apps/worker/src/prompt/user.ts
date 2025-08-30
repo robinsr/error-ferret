@@ -20,7 +20,7 @@ function prepareRawArtifact(artifact: ReviewRawArtifact): CodeFile {
   return { filename: "text", lines };
 }
 
-function printCodeObject(codeObject: CodeFile, index: number): string {
+function printFileBlockV1(codeObject: CodeFile, index: number): string {
   const lines = codeObject.lines.map((line) => {
     return `    {"id": "${line.id}", "n": ${line.num}, "text": "${line.text}"}`
   })
@@ -35,6 +35,17 @@ ${lines.join(',\n')}
 ---`
 }
 
+function printFileBlockV2(codeObject: CodeFile, index: number): string {
+  const lines = codeObject.lines.map((line) => {
+    return `${line.id}: ${line.text}`
+  })
+
+  return `
+FILE: ${index}
+${lines.join('\n')}`
+}
+
+
 export const generateUserPrompt = (review: Review): string => {
 
   const codeObjects = review.submission.artifacts.map((artifact) => {
@@ -46,14 +57,15 @@ export const generateUserPrompt = (review: Review): string => {
   })
 
   const objectCount = codeObjects.length;
+  const codeBlocks = codeObjects.map((codeObject, index) => printFileBlockV2(codeObject, index + 1))
 
-  console.log("Parsed code in user prompt", codeObjects)
+  console.log("Code blocks", codeBlocks)
 
 
   const message = `
 FILES: ${objectCount}
 ---
-${codeObjects.map((codeObject, index) => printCodeObject(codeObject, index + 1)).join('\n')}
+${codeBlocks.join('\n---\n')}
 ---
 FOCUS_AREAS: ${getFocusValueKeys(review).join(', ')}
 `

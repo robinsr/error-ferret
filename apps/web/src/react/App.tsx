@@ -6,16 +6,16 @@ import React, { useEffect, useState } from 'react'
 import { createReviewFromPaste, createReviewFromArtifacts, getReview } from '@lib/api'
 import { readFileToArtifact } from '@lib/artifacts'
 
-import ErrorMsg from '@react-components/ErrorMsg.tsx'
-import Features from '@react-components/Features.tsx'
-import Header from '@react-components/Header.tsx'
-import Loading from '@react-components/Loading.tsx'
-import Section from '@react-components/Section.tsx'
+import ErrorMsg from './components/ui/ErrorMsg.tsx'
+import Loading from './components/ui/Loading.tsx'
+import Section from './components/ui/Section.tsx'
 
-import SubmitButton from '@react-components/InputForm/SubmitButton'
-import TextareaInput from '@react-components/InputForm/TextareaInput'
-import ReviewerSelector from '@react-components/InputForm/ReviewerSelector'
-import FileUploadInput from '@react-components/InputForm/FileUploadInput'
+import Features from './components/widgets/Features.tsx'
+
+import SubmitButton from './components/sections/InputForm/SubmitButton'
+import TextareaInput from './components/sections/InputForm/TextareaInput.tsx'
+import ReviewerSelector from './components/sections/InputForm/ReviewerSelector.tsx'
+import FileUploadInput from './components/sections/InputForm/FileUploadInput.tsx'
 
 import { FERRET_REVIEWERS } from '@errorferret/reviewers'
 

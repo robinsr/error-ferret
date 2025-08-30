@@ -3,8 +3,7 @@ import type { Review } from '@errorferret/schemas';
 
 import { MAX_FEEDBACK_ITEMS } from '@errorferret/constants';
 import { FERRET_REVIEWERS } from '@errorferret/reviewers';
-import { getFocusValueList, getFocusValueSchema, getReviewerProfiles } from './rubric';
-import { getInputBlock } from './input';
+import { getInputBlockv2 } from './input';
 import { getOutputBlock } from './output';
 import { getRulesBlock } from './rules';
 import { getRubricBlock } from './rubric';
@@ -33,7 +32,7 @@ Key Instructions:
 - Prefer diagnosis over rewrites. Suggest alternatives at a high level; Do not respond with code rewrites—describe the changes in words.
 - Avoid debatable stylistic nitpicks unless they materially affect readability or maintainability. Do not invent context beyond the provided text.
 
-${getInputBlock(review)}
+${getInputBlockv2(review)}
 
 ${getOutputBlock(review)}
 

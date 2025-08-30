@@ -2,9 +2,9 @@ import type { ReviewFeedbackItem } from '@errorferret/types';
 
 import React from 'react';
 
-import FeedbackCodeBlock from '@react-components/ReviewFeedback/FeedbackCodeBlock';
-import FeedbackLocation from '@react-components/ReviewFeedback/FeedbackLocation';
-import FeedbackComment from '@react-components/ReviewFeedback/FeedbackComment';
+import FeedbackCodeBlock from './FeedbackCodeBlock.tsx';
+import FeedbackLocation from './FeedbackLocation.tsx';
+import FeedbackComment from './FeedbackComment.tsx';
 
 
 interface Props {

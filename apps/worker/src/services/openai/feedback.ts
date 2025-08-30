@@ -90,6 +90,8 @@ export async function generateStyledFeedback(review: Review, findings: ModelFind
   const response = await getGpt4Response(systemPrompt, userPrompt)
   const lines = response.split('\n')
 
+  console.log("Styled feedback", lines)
+
   return findings
     .map((finding, index) => ({
       ...finding,

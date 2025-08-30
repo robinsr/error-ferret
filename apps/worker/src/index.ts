@@ -82,9 +82,8 @@ async function run() {
 
       console.log('completed', review.id);
     } catch (e) {
+      console.log('worker error', e);
       await updateReview({ ...review, status: "failed" });
-
-      console.error('worker error', e);
     }
   }
 }
