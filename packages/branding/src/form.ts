@@ -19,6 +19,9 @@ export const FORM = {
   },
   REVIEWERS: {
     HELP: "Click to enlist ferrets for duty. Each one contributes its own sharp nose and perspective",
+  },
+  SUBMIT: {
+    LABEL: "Send in the Ferrets!",
   }
 }
 

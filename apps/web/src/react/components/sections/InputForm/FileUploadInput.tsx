@@ -1,6 +1,9 @@
 import type { ChangeEvent } from 'react';
-import React, { useState, useRef } from 'react';
+
+import React, { useRef } from 'react';
 import { FilePlus } from 'lucide-react';
+import clsx from 'clsx';
+
 import { SUPPORTED_LANGUAGES } from '@errorferret/constants';
 
 
@@ -37,8 +40,12 @@ const FileUploadInput: React.FC<Props> = ({ selectedFiles, onFilesChange }) => {
 
             <FilePlus className="mx-auto h-12 w-12 text-gray-400" strokeWidth={1.0} />
 
-            <div className="flex text-sm text-gray-300">
-              <label htmlFor="file-upload" className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+            <div className="flex text-sm text-gray-300 items-center">
+              <label htmlFor="file-upload" className={clsx([
+                  "px-1 py-1",
+                  "relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-300",
+                  "focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                ])}>
                 <span>Upload files</span>
                 <input
                   ref={fileInputRef}
